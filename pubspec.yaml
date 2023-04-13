@@ -10,9 +10,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.2
   salomon_bottom_bar: ^3.3.1
+  shared_preferences: ^2.1.0
+  flutter_redux: ^0.10.0
+  redux: ^5.0.0
+  yaml: ^3.1.1
+  webview_flutter: ^4.0.7
+  html: ^0.15.2
+  http: ^0.13.5
+  google_fonts: ^4.0.3
+  intl: ^0.17.0
+  url_launcher: ^6.1.10
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +33,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+    - pubspec.yaml
