@@ -19,7 +19,7 @@ class LoadingPage extends StatelessWidget {
                 width: 150.0,
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.secondary,
+                    Theme.of(context).colorScheme.primary,
                   ),
                   strokeWidth: 3.0,
                 ),

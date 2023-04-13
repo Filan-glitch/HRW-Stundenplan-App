@@ -16,7 +16,7 @@ class WeekSelectorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime lastDay = firstDayOfWeek.add(const Duration(days: 5));
+    DateTime lastDay = firstDayOfWeek.add(const Duration(days: 6));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

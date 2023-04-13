@@ -5,6 +5,7 @@ import 'package:timetable/service/network_fetch.dart';
 
 import '../model/event.dart';
 import '../model/redux/app_state.dart';
+import '../service/storage.dart';
 import 'break.dart';
 import 'list_item.dart';
 
@@ -55,13 +56,25 @@ class TimetableWidget extends StatelessWidget {
                 size: 120.0,
                 color: Theme.of(context).dividerColor.withOpacity(0.5),
               ),
-              const Text("Es stehen keine Termine an!")
+              const Text("Es stehen keine Termine an!"),
+              TextButton(
+                onPressed: () {
+                  fetchData(startOfWeek).then((_) {
+                    writeDataToStorage();
+                  });
+                },
+                child: const Text("Aktualisieren"),
+              ),
             ],
           );
         }
 
         return RefreshIndicator(
-          onRefresh: () async {},
+          onRefresh: () async {
+            await fetchData(startOfWeek).then((_) {
+              writeDataToStorage();
+            });
+          },
           child: ListView.builder(
               itemCount: events.length,
               padding: const EdgeInsets.all(20),
