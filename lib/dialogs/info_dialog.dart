@@ -49,11 +49,18 @@ class InfoDialog extends StatelessWidget {
           ),
         ),
         TextButton(
-            onPressed: () {
-              launchUrl(Uri.parse(
-                  "https://gitlab.janbellenberg.de/janbellenberg/timetable"));
-            },
-            child: const Text("Zum Git-Repository")),
+          onPressed: () {
+            launchUrl(Uri.parse(
+                "https://gitlab.janbellenberg.de/janbellenberg/timetable"));
+          },
+          child: const Text("Zum Git-Repository"),
+        ),
+        TextButton(
+          onPressed: () {
+            showLicensePage(context: context);
+          },
+          child: const Text("Lizenzen"),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: const [

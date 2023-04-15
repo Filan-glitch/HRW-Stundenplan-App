@@ -1,49 +1,81 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:intl/intl.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
+import 'package:oktoast/oktoast.dart';
 
 import '../model/event.dart';
 import '../model/redux/actions.dart';
 import '../model/redux/store.dart';
 import 'storage.dart';
 
-Future<void> loadFourWeekInterval({DateTime? start}) {
+Future<void> loadWeekInterval({DateTime? start, int weeks = 6}) {
   start ??= DateTime.now();
 
   start = start.subtract(Duration(days: start.weekday - 1));
 
-  return Future.wait([
-    fetchData(start),
-    fetchData(start.add(const Duration(days: 7))),
-    fetchData(start.add(const Duration(days: 14))),
-    fetchData(start.add(const Duration(days: 21))),
-  ]).then((_) {
+  List<Future<void>> tasks = [
+    for (int i = 0; i < weeks; i++)
+      fetchData(
+        start.add(
+          Duration(days: i * 7),
+        ),
+      ),
+  ];
+
+  return Future.wait(tasks).then((_) {
     writeDataToStorage();
   });
 }
 
 Future<void> fetchData(DateTime monday) async {
-  if (store.state.args == null || store.state.cnsc == null) return;
-
-  store.dispatch(Action(ActionTypes.startTask));
-  dom.Document body = await _fetchScheduleHTML(monday);
-  List<Event> events = await _parse(body);
-
   DateFormat formatter = DateFormat('dd/MM/yyyy');
-  store.dispatch(Action(ActionTypes.setEvents, payload: {
-    "date": formatter.format(monday),
-    "events": events,
-  }));
+  try {
+    if (store.state.args == null || store.state.cnsc == null) return;
 
-  store.dispatch(Action(ActionTypes.stopTask));
+    store.dispatch(Action(ActionTypes.startTask));
+    dom.Document body = await _fetchScheduleHTML(monday);
+    List<Event> events = await _parse(body);
+
+    store.dispatch(Action(ActionTypes.setEvents, payload: {
+      "date": formatter.format(monday),
+      "events": events,
+    }));
+
+    store.dispatch(Action(ActionTypes.stopTask));
+  } on TimeoutException {
+    showToast('Keine Verbindung');
+    store.dispatch(Action(ActionTypes.stopTask));
+  } on SocketException {
+    showToast('Keine Verbindung');
+    store.dispatch(Action(ActionTypes.stopTask));
+  } on Error catch (e, stackTrace) {
+    showToast('Es ist ein Fehler aufgetreten');
+    store.dispatch(Action(ActionTypes.stopTask));
+    FirebaseCrashlytics.instance.recordError(e, stackTrace);
+  } catch (e, stackTrace) {
+    showToast('Es ist ein Fehler aufgetreten');
+    store.dispatch(Action(ActionTypes.stopTask));
+    FirebaseCrashlytics.instance.recordError(e, stackTrace);
+  } finally {
+    if (!store.state.events.containsKey(formatter.format(monday))) {
+      store.dispatch(Action(ActionTypes.setEvents, payload: {
+        "date": formatter.format(monday),
+        "events": <Event>[],
+      }));
+    }
+  }
 }
 
 Future<List<Event>> _parse(dom.Document document) async {
   List<Event> events = [];
   if (!document.outerHtml.contains("Stundenplan")) {
+    showToast("Bitte melden Sie sich erneut an");
     store.dispatch(Action(
       ActionTypes.setCredentials,
       payload: {"cnsc": null, "args": null},

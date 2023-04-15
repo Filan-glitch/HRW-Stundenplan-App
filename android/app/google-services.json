@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "177253641824",
+    "project_id": "stundenplan-cd6c9",
+    "storage_bucket": "stundenplan-cd6c9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177253641824:android:fd4235b05984ce2b6e1d05",
+        "android_client_info": {
+          "package_name": "de.janbellenberg.timetable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177253641824-62si6kbgklpidg9l8j806s6mdcvscgd3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYmDpHMAZ6ADsKyBFPqHiK4ae48dP2uEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177253641824-62si6kbgklpidg9l8j806s6mdcvscgd3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

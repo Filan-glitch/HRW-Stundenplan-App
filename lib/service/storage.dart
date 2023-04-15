@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:intl/intl.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/event.dart';
@@ -10,21 +13,42 @@ Future<void> loadDataFromStorage() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final RegExp dateRegExp = RegExp(r"\d{2}\/\d{2}\/\d{4}");
 
+  List<String> toDelete = [];
+
   for (String date in prefs.getKeys()) {
-    if (!dateRegExp.hasMatch(date)) continue;
+    try {
+      if (!dateRegExp.hasMatch(date)) continue;
 
-    List<dynamic> parsed = jsonDecode(prefs.getString(date) ?? "[]");
-    List<Event> eventsOnDay = [];
-    for (dynamic event in parsed) {
-      if (event is! Map<String, dynamic>) continue;
+      // remove past events
+      DateFormat formatter = DateFormat('dd/MM/yyyy');
+      DateTime day = formatter.parse(date);
+      if (day.isBefore(DateTime.now().subtract(const Duration(days: 7)))) {
+        toDelete.add(date);
+        continue;
+      }
 
-      eventsOnDay.add(Event.fromAPI(event));
+      // parse events
+      List<dynamic> parsed = jsonDecode(prefs.getString(date) ?? "[]");
+      List<Event> eventsOnDay = [];
+      for (dynamic event in parsed) {
+        if (event is! Map<String, dynamic>) continue;
+
+        eventsOnDay.add(Event.fromAPI(event));
+      }
+
+      store.dispatch(Action(ActionTypes.setEvents, payload: {
+        "date": date,
+        "events": eventsOnDay,
+      }));
+    } catch (e, stackTrace) {
+      showToast('Es ist ein Fehler aufgetreten');
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+      continue;
     }
+  }
 
-    store.dispatch(Action(ActionTypes.setEvents, payload: {
-      "date": date,
-      "events": eventsOnDay,
-    }));
+  for (String date in toDelete) {
+    prefs.remove(date);
   }
 }
 

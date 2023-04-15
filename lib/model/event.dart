@@ -89,7 +89,10 @@ enum Weekday {
   }
 
   static Weekday getByValue(int value) {
-    return Weekday.values.firstWhere((x) => x.value == value);
+    return Weekday.values.firstWhere(
+      (x) => x.value == value,
+      orElse: () => Weekday.monday,
+    );
   }
 }
 

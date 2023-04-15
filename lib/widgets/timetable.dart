@@ -44,7 +44,7 @@ class TimetableWidget extends StatelessWidget {
               .toList()
             ..sort();
         } else {
-          loadFourWeekInterval(start: startOfWeek);
+          loadWeekInterval(start: startOfWeek);
         }
 
         if (events.isEmpty) {

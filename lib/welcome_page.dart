@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:timetable/service/storage.dart';
 
 import 'dialogs/info_dialog.dart';
@@ -47,12 +48,10 @@ class WelcomePage extends StatelessWidget {
                       ));
                       await writeCredentialsToStorage();
 
-                      loadFourWeekInterval();
+                      loadWeekInterval();
                     }, onFailure: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Es ist ein Fehler aufgetreten!"),
-                      ));
+                      showToast("Es ist ein Fehler aufgetreten");
                     }),
                   ),
                 );
@@ -80,6 +79,15 @@ class WelcomePage extends StatelessWidget {
               },
               child: const Text("Über die App"),
             ),
+            const Opacity(
+              opacity: 0.6,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50.0),
+                child: Text(
+                  "Mit Nutzung dieser App akzeptieren Sie, dass etwaige Fehlermeldungen an Firebase Crashlytics gesendet werden.",
+                ),
+              ),
+            )
           ],
         ),
       ),
