@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> {
 
     if (DateTime.now().weekday < 6) {
       _activePage = Weekday.getByValue(DateTime.now().weekday - 1);
+    } else {
+      _currentWeek = _currentWeek.add(const Duration(days: 7));
     }
   }
 
