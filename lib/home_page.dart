@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:timetable/week_overview_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'dialogs/info_dialog.dart';
 import 'edit_event_page.dart';
@@ -56,6 +57,22 @@ class _HomePageState extends State<HomePage> {
           return Scaffold(
             body: PageWrapper(
               actions: [
+                if (state.updateAvailable)
+                  IconButton(
+                    onPressed: () {
+                      launchUrl(
+                        Uri.parse(
+                            "https://www.janbellenberg.de/download/timetable.apk"),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.download,
+                      color: Colors.white,
+                    ),
+                  ),
+              ],
+              menuActions: [
                 ListTile(
                   leading: Icon(
                     Icons.calendar_month,
@@ -85,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PdfPage(
+                        builder: (context) => PdfPage(
                           title: "Speiseplan",
                           url:
                               "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/aktuelle_woche.pdf",
@@ -105,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PdfPage(
+                        builder: (context) => PdfPage(
                           title: "Speiseplan",
                           url:
                               "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/naechste_woche.pdf",

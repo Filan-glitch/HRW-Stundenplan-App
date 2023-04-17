@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
+import 'package:internet_file/internet_file.dart';
+import 'package:pdfx/pdfx.dart';
 
 class PdfPage extends StatelessWidget {
-  const PdfPage({required this.url, this.title = "PDF Viewer", super.key});
+  PdfPage({required this.url, this.title = "PDF Viewer", super.key}) {
+    _controller = PdfControllerPinch(
+      document: PdfDocument.openData(InternetFile.get(url)),
+    );
+  }
   final String url;
   final String title;
+  late final PdfControllerPinch _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +18,9 @@ class PdfPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: const PDF(
-        autoSpacing: false,
-      ).cachedFromUrl(url),
+      body: PdfViewPinch(
+        controller: _controller,
+      ),
     );
   }
 }
