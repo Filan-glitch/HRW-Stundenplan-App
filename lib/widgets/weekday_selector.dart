@@ -17,27 +17,37 @@ class WeekdaySelectorWidget extends StatelessWidget {
       onTap: (i) => onChanged(Weekday.getByValue(i)),
       items: [
         SalomonBottomBarItem(
-          icon: const Icon(Icons.looks_one),
+          icon: weekday == Weekday.monday
+              ? const Icon(Icons.looks_one)
+              : const Text("Mo"),
           title: const Text("Montag"),
           selectedColor: Theme.of(context).colorScheme.primary,
         ),
         SalomonBottomBarItem(
-          icon: const Icon(Icons.looks_two),
+          icon: weekday == Weekday.tuesday
+              ? const Icon(Icons.looks_two)
+              : const Text("Di"),
           title: const Text("Dienstag"),
           selectedColor: Theme.of(context).colorScheme.primary,
         ),
         SalomonBottomBarItem(
-          icon: const Icon(Icons.looks_3),
+          icon: weekday == Weekday.wednesday
+              ? const Icon(Icons.looks_3)
+              : const Text("Mi"),
           title: const Text("Mittwoch"),
           selectedColor: Theme.of(context).colorScheme.primary,
         ),
         SalomonBottomBarItem(
-          icon: const Icon(Icons.looks_4),
+          icon: weekday == Weekday.thursday
+              ? const Icon(Icons.looks_4)
+              : const Text("Do"),
           title: const Text("Donnerstag"),
           selectedColor: Theme.of(context).colorScheme.primary,
         ),
         SalomonBottomBarItem(
-          icon: const Icon(Icons.looks_5),
+          icon: weekday == Weekday.friday
+              ? const Icon(Icons.looks_5)
+              : const Text("Fr"),
           title: const Text("Freitag"),
           selectedColor: Theme.of(context).colorScheme.primary,
         ),

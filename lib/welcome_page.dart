@@ -39,20 +39,22 @@ class WelcomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        LoginPage(onLoginSuccessful: (args, cnsc) async {
-                      Navigator.pop(context);
-                      store.dispatch(redux.Action(
-                        redux.ActionTypes.setCredentials,
-                        payload: {"cnsc": cnsc, "args": args},
-                      ));
-                      await writeCredentialsToStorage();
+                    builder: (context) => LoginPage(
+                      onLoginSuccessful: (args, cnsc) async {
+                        Navigator.pop(context);
+                        store.dispatch(redux.Action(
+                          redux.ActionTypes.setCredentials,
+                          payload: {"cnsc": cnsc, "args": args},
+                        ));
+                        await writeCredentialsToStorage();
 
-                      loadWeekInterval();
-                    }, onFailure: () {
-                      Navigator.pop(context);
-                      showToast("Es ist ein Fehler aufgetreten");
-                    }),
+                        loadWeekInterval();
+                      },
+                      onFailure: () {
+                        Navigator.pop(context);
+                        showToast("Es ist ein Fehler aufgetreten");
+                      },
+                    ),
                   ),
                 );
               },
