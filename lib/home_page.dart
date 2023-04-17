@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -25,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Weekday _activePage = Weekday.monday;
   late DateTime _currentWeek;
+  double _swipeDeltaX = 0;
 
   @override
   void initState() {
@@ -88,18 +91,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ListTile(
                   leading: Icon(
-                    Icons.logout,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  title: const Text("Abmelden"),
-                  onTap: () {
-                    Navigator.pop(context);
-                    clearStorage();
-                    store.dispatch(redux.Action(redux.ActionTypes.clear));
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
                     Icons.info_outline,
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -111,6 +102,18 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) => const InfoDialog(),
                       barrierColor: Colors.transparent,
                     );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Abmelden"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    clearStorage();
+                    store.dispatch(redux.Action(redux.ActionTypes.clear));
                   },
                 ),
               ],
@@ -139,10 +142,50 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Expanded(
+                    child: GestureDetector(
+                      onHorizontalDragStart: (details) => _swipeDeltaX = 0,
+                      onHorizontalDragUpdate: (details) =>
+                          _swipeDeltaX += details.delta.dx,
+                      onHorizontalDragEnd: (details) {
+                        // left swipe -> next page
+                        if (_swipeDeltaX < -50) {
+                          if (_activePage == Weekday.friday) {
+                            setState(() {
+                              _activePage = Weekday.monday;
+                              _currentWeek = _currentWeek.add(
+                                const Duration(days: 7),
+                              );
+                            });
+                          } else {
+                            setState(() {
+                              _activePage =
+                                  Weekday.getByValue(_activePage.value + 1);
+                            });
+                          }
+                        } else if (_swipeDeltaX > 50) {
+                          // right swipe -> previous page
+                          if (_activePage == Weekday.monday &&
+                              _currentWeek.isAfter(DateTime.now())) {
+                            setState(() {
+                              _activePage = Weekday.friday;
+                              _currentWeek = _currentWeek.subtract(
+                                const Duration(days: 7),
+                              );
+                            });
+                          } else {
+                            setState(() {
+                              _activePage =
+                                  Weekday.getByValue(_activePage.value - 1);
+                            });
+                          }
+                        }
+                      },
                       child: TimetableWidget(
-                    weekday: _activePage,
-                    startOfWeek: _currentWeek,
-                  )),
+                        weekday: _activePage,
+                        startOfWeek: _currentWeek,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
