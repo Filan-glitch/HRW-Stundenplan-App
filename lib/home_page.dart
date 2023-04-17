@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'dialogs/info_dialog.dart';
 import 'edit_event_page.dart';
+import 'food_page.dart';
 import 'loading_page.dart';
 import 'model/redux/actions.dart' as redux;
 import 'model/event.dart';
@@ -56,21 +57,46 @@ class _HomePageState extends State<HomePage> {
           return Scaffold(
             body: PageWrapper(
               actions: [
-                /*ListTile(
-                      leading: const Icon(
-                        Icons.edit,
-                        color: Theme.of(context).colorScheme.primary,
+                ListTile(
+                  leading: Icon(
+                    Icons.fastfood,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Speiseplan"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PdfPage(
+                          title: "Speiseplan",
+                          url:
+                              "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/aktuelle_woche.pdf",
+                        ),
                       ),
-                      title: state.editable
-                          ? const Text("Änderungen speichern")
-                          : const Text("Daten ändern"),
-                      onTap: () {
-                        Navigator.pop(context);
-                        store.dispatch(
-                          redux.Action(redux.ActionTypes.toggleEditMode),
-                        );
-                      },
-                    ),*/
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.fastfood,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Speiseplan (nächste Woche)"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PdfPage(
+                          title: "Speiseplan",
+                          url:
+                              "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/naechste_woche.pdf",
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: Icon(
                     Icons.lightbulb_outline,
