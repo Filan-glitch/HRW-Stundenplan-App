@@ -8,7 +8,7 @@ ThemeData darkTheme = ThemeData(
   dividerColor: Colors.white,
   colorScheme: const ColorScheme.dark(
     background: Color(0xff191D24),
-    primary: Color(0xFF009fe3),
+    primary: Color(0xFF0083BB),
   ),
   textTheme: GoogleFonts.montserratTextTheme().apply(
     bodyColor: Colors.white,
