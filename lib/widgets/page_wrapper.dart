@@ -8,12 +8,14 @@ class PageWrapper extends StatelessWidget {
   const PageWrapper({
     required this.child,
     this.actions = const [],
+    this.menuActions = const [],
     this.title = "Stundenplan",
     this.canGoBack = false,
     super.key,
   });
 
   final Widget child;
+  final List<Widget> menuActions;
   final List<Widget> actions;
   final String title;
   final bool canGoBack;
@@ -63,15 +65,20 @@ class PageWrapper extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (actions.isNotEmpty)
-                          IconButton(
-                            padding: const EdgeInsets.all(0),
-                            icon: const Icon(
-                              Icons.more_vert,
-                              size: 30.0,
-                              color: Colors.white,
-                            ),
-                            onPressed: () => _showActionMenu(context),
+                        if (menuActions.isNotEmpty)
+                          Row(
+                            children: [
+                              ...actions,
+                              IconButton(
+                                padding: const EdgeInsets.all(0),
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  size: 30.0,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () => _showActionMenu(context),
+                              ),
+                            ],
                           ),
                       ],
                     ),
@@ -103,7 +110,7 @@ class PageWrapper extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 400.0),
       builder: (context) => ActionMenu(
         children: [
-          ...actions,
+          ...menuActions,
         ],
       ),
       barrierColor: Colors.transparent,

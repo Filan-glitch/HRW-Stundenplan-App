@@ -34,6 +34,8 @@ AppState appReducer(AppState state, dynamic action) {
     state.runningTasks--;
   } else if (action.type == ActionTypes.setupCompleted) {
     state.dataLoaded = true;
+  } else if (action.type == ActionTypes.updateAvailable) {
+    state.updateAvailable = true;
   }
   return state;
 }

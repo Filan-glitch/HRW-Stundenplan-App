@@ -11,6 +11,7 @@ import 'package:timetable/service/storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'service/update.dart';
 import 'themes/dark.dart';
 import 'home_page.dart';
 import 'themes/light.dart';
@@ -50,6 +51,8 @@ void main() {
     ]).then((value) {
       store.dispatch(redux.Action(redux.ActionTypes.setupCompleted));
     });
+
+    checkForUpdate();
   });
 
   runApp(const MyApp());
@@ -97,8 +100,8 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
             ],
             home: OKToast(
-              child: state.dataLoaded ? const HomePage() : const Scaffold(),
               position: ToastPosition.bottom,
+              child: state.dataLoaded ? const HomePage() : const Scaffold(),
             ),
           );
         }),

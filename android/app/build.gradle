@@ -33,7 +33,7 @@ android {
         keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
     }
 
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -50,8 +50,11 @@ android {
     }
 
     defaultConfig {
+        configurations.all {
+            resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
+        }
         applicationId "de.janbellenberg.timetable"
-        minSdkVersion 19
+        minSdkVersion 27
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
