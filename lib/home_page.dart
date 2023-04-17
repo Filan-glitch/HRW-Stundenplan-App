@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:timetable/week_overview_page.dart';
 
 import 'dialogs/info_dialog.dart';
 import 'edit_event_page.dart';
-import 'food_page.dart';
+import 'pdf_page.dart';
 import 'loading_page.dart';
 import 'model/redux/actions.dart' as redux;
 import 'model/event.dart';
@@ -57,6 +56,24 @@ class _HomePageState extends State<HomePage> {
           return Scaffold(
             body: PageWrapper(
               actions: [
+                ListTile(
+                  leading: Icon(
+                    Icons.calendar_month,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Wochenübersicht"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WeekOverviewPage(
+                          firstDayOfWeek: _currentWeek,
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: Icon(
                     Icons.fastfood,

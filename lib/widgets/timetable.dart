@@ -7,6 +7,7 @@ import '../model/event.dart';
 import '../model/redux/app_state.dart';
 import '../service/storage.dart';
 import 'break.dart';
+import 'empty_schedule.dart';
 import 'list_item.dart';
 
 class TimetableWidget extends StatelessWidget {
@@ -48,24 +49,12 @@ class TimetableWidget extends StatelessWidget {
         }
 
         if (events.isEmpty) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(
-                Icons.sunny,
-                size: 120.0,
-                color: Theme.of(context).dividerColor.withOpacity(0.5),
-              ),
-              const Text("Es stehen keine Termine an!"),
-              TextButton(
-                onPressed: () {
-                  fetchData(startOfWeek).then((_) {
-                    writeDataToStorage();
-                  });
-                },
-                child: const Text("Aktualisieren"),
-              ),
-            ],
+          return EmptyScheduleWidget(
+            onRefresh: () {
+              fetchData(startOfWeek).then((_) {
+                writeDataToStorage();
+              });
+            },
           );
         }
 
