@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,7 +43,9 @@ Future<void> loadDataFromStorage() async {
       }));
     } catch (e, stackTrace) {
       showToast('Es ist ein Fehler aufgetreten');
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+      if (!kDebugMode) {
+        FirebaseCrashlytics.instance.recordError(e, stackTrace);
+      }
       continue;
     }
   }

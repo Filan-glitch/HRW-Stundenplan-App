@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:oktoast/oktoast.dart';
@@ -33,8 +34,12 @@ Future<void> checkForUpdate() async {
   } on SocketException {
     return;
   } on Error catch (e, stackTrace) {
-    FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    if (!kDebugMode) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    }
   } catch (e, stackTrace) {
-    FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    if (!kDebugMode) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    }
   }
 }
