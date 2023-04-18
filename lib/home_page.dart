@@ -203,6 +203,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onHorizontalDragStart: (details) => _swipeDeltaX = 0,
                       onHorizontalDragUpdate: (details) =>
                           _swipeDeltaX += details.delta.dx,
