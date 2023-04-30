@@ -26,6 +26,8 @@ void main() {
   Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ).then((value) {
+    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+
     if (!kDebugMode) {
       FlutterError.onError = (errorDetails) {
         try {

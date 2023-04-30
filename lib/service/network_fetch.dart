@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html;
@@ -58,16 +57,12 @@ Future<void> fetchData(DateTime monday) async {
   } on Error catch (e, stackTrace) {
     showToast('Es ist ein Fehler aufgetreten');
     store.dispatch(Action(ActionTypes.stopTask));
-    if (!kDebugMode) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
-    }
+    FirebaseCrashlytics.instance.recordError(e, stackTrace);
   } catch (e, stackTrace) {
     showToast('Es ist ein Fehler aufgetreten');
     store.dispatch(Action(ActionTypes.stopTask));
 
-    if (!kDebugMode) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
-    }
+    FirebaseCrashlytics.instance.recordError(e, stackTrace);
   } finally {
     if (!store.state.events.containsKey(formatter.format(monday))) {
       store.dispatch(Action(ActionTypes.setEvents, payload: {
