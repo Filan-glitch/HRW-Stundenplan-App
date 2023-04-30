@@ -127,83 +127,6 @@ Future<List<Event>> _parse(dom.Document document) async {
   return events;
 }
 
-/*Future<List<Event>> _parseRegistrationTableOLD(
-    String cnsc, dom.Document document) async {
-  List<Event> result = [];
-
-  for (dom.Element row in document
-      .querySelectorAll("table.tb750")[1]
-      .querySelectorAll("td.dl-inner")) {
-    // parse title
-    String? title = row.children.isNotEmpty
-        ? row.children[0].text.trim().substring(9)
-        : null;
-
-    // parse start & end time
-    String? timeString = row.children.length > 2 ? row.children[2].text : null;
-    Time? startTime, endTime;
-
-    if (timeString != null) {
-      List<RegExpMatch> times =
-          RegExp(r'\[\d{2}:\d{2}\]').allMatches(timeString).toList();
-
-      if (times.length >= 2) {
-        String? start = times[0].group(0)?.replaceAll(RegExp(r'\[|\]'), "");
-        String? end = times[1].group(0)?.replaceAll(RegExp(r'\[|\]'), "");
-
-        startTime = Time(
-          int.parse(start?.toString().split(":")[0] ?? "0"),
-          int.parse(start?.toString().split(":")[1] ?? "0"),
-        );
-
-        endTime = Time(
-          int.parse(end?.toString().split(":")[0] ?? "0"),
-          int.parse(end?.toString().split(":")[1] ?? "0"),
-        );
-      }
-    }
-
-    // parse room
-    String? detailsURL = row.children[0].querySelector("a")?.attributes["href"];
-    String? room;
-    if (detailsURL != null) {
-      dom.Document detailsDocument = await _fetchDetailsHTML(detailsURL, cnsc);
-      room = detailsDocument
-          .querySelector("span[name=appointmentRooms]")
-          ?.text
-          .trim()
-          .replaceAll(RegExp(r'\(\d+\)'), "")
-          .trim();
-    }
-
-    // parse weekday
-    int weekday = 0;
-    if (row.children[2].text.contains("Mo,")) {
-      weekday = 0;
-    } else if (row.children[2].text.contains("Di,")) {
-      weekday = 1;
-    } else if (row.children[2].text.contains("Mi,")) {
-      weekday = 2;
-    } else if (row.children[2].text.contains("Do,")) {
-      weekday = 3;
-    } else if (row.children[2].text.contains("Fr,")) {
-      weekday = 4;
-    }
-
-    Event event = Event(
-      title: title ?? "",
-      start: startTime ?? const Time(0, 0),
-      end: endTime ?? const Time(0, 0),
-      day: Weekday.getByValue(weekday),
-      room: room ?? "",
-    );
-
-    result.add(event);
-  }
-
-  return result;
-}*/
-
 Future<dom.Document> _fetchScheduleHTML(
   DateTime monday,
 ) async {
@@ -217,25 +140,3 @@ Future<dom.Document> _fetchScheduleHTML(
 
   return html.parse(utf8.decode(registrations.bodyBytes));
 }
-
-/*Future<dom.Document> _fetchRegistrationHTML(String cnsc, String args) async {
-  http.Response registrations = await http.get(
-      Uri.parse(
-        "https://campusnet.hs-ruhrwest.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=MYREGISTRATIONS&ARGUMENTS=$args",
-      ),
-      headers: {"Cookie": "cnsc=$cnsc"});
-
-  return html.parse(
-    utf8.decode(registrations.bodyBytes),
-  );
-}
-
-Future<dom.Document> _fetchDetailsHTML(String detailsURL, String cnsc) async {
-  http.Response details = await http.get(
-    Uri.parse('https://campusnet.hs-ruhrwest.de/$detailsURL'),
-    headers: {"Cookie": "cnsc=$cnsc"},
-  );
-  return html.parse(
-    utf8.decode(details.bodyBytes),
-  );
-}*/

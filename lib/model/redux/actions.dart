@@ -1,9 +1,6 @@
 /// List of actions, that are supported by the redux reducer function.
 enum ActionTypes {
   setEvents,
-  /*addEvent,
-  updateEvent,
-  deleteEvent,*/
   clear,
   setDarkmode,
   setCredentials,

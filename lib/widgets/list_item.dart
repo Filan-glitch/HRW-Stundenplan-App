@@ -52,32 +52,6 @@ class ListItem extends StatelessWidget {
                             Text(event.room),
                           ],
                         ),
-                        /*const Spacer(),
-                        if (state.editable)
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditEventPage(
-                                    event: event,
-                                  ),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
-                          ),
-                        if (state.editable)
-                          IconButton(
-                            onPressed: () {
-                              // TODO: add confirm dialog
-                              store.dispatch(redux.Action(
-                                redux.ActionTypes.deleteEvent,
-                                payload: event,
-                              ));
-                            },
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                          ),*/
                       ],
                     ),
                   ],

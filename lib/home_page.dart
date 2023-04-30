@@ -4,7 +4,6 @@ import 'package:timetable/week_overview_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'dialogs/info_dialog.dart';
-import 'edit_event_page.dart';
 import 'pdf_page.dart';
 import 'loading_page.dart';
 import 'model/redux/actions.dart' as redux;
@@ -250,19 +249,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            floatingActionButton: state.editable
-                ? FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditEventPage(),
-                        ),
-                      );
-                    },
-                    child: const Icon(Icons.add),
-                  )
-                : null,
             bottomNavigationBar: WeekdaySelectorWidget(
               weekday: _activePage,
               onChanged: (weekday) => setState(() {
