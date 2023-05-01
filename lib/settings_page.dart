@@ -95,7 +95,7 @@ class SettingsPage extends StatelessWidget {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => const ChangelogDialog(),
+                    builder: (context) => ChangelogDialog(),
                   );
                 },
               ),

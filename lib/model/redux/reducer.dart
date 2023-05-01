@@ -26,6 +26,8 @@ AppState appReducer(AppState state, dynamic action) {
     state.dataLoaded = true;
   } else if (action.type == ActionTypes.updateAvailable) {
     state.updateAvailable = true;
+  } else if (action.type == ActionTypes.showChangelog) {
+    state.showChangelog = action.payload;
   }
   return state;
 }

@@ -3,6 +3,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:timetable/week_overview_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dialogs/changelog_dialog.dart';
+import 'model/redux/actions.dart' as redux;
+import 'model/redux/store.dart';
 import 'pdf_page.dart';
 import 'loading_page.dart';
 import 'model/event.dart';
@@ -38,6 +41,8 @@ class _HomePageState extends State<HomePage> {
     } else {
       _currentWeek = _currentWeek.add(const Duration(days: 7));
     }
+
+    // check if changelog dialog should be shown
   }
 
   @override
@@ -65,6 +70,28 @@ class _HomePageState extends State<HomePage> {
                     icon: const Icon(
                       Icons.download,
                       color: Colors.white,
+                    ),
+                  ),
+                if (state.showChangelog)
+                  IconButton(
+                    onPressed: () {
+                      store.dispatch(redux.Action(
+                        redux.ActionTypes.showChangelog,
+                        payload: false,
+                      ));
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => ChangelogDialog(),
+                      );
+                    },
+                    icon: Badge(
+                      backgroundColor: Colors.red.withOpacity(0.9),
+                      label: const Text('1'),
+                      child: const Icon(
+                        Icons.update,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],

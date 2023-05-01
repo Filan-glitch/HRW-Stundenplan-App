@@ -59,6 +59,7 @@ void main() {
     });
 
     checkForUpdate();
+    shouldShowChangelogIcon();
   });
 
   runApp(const MyApp());

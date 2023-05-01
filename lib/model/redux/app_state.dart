@@ -7,6 +7,7 @@ class AppState {
   int runningTasks = 0;
   bool get loading => runningTasks > 0;
   bool updateAvailable = false;
+  bool showChangelog = false;
   String? cnsc, args;
   Map<String, List<Event>> events = {};
 }
