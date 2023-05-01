@@ -22,76 +22,78 @@ class TimetableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, AppState>(
-      converter: (store) => store.state,
-      builder: (context, state) {
-        DateFormat formatter = DateFormat('dd/MM/yyyy');
-        String key = formatter.format(startOfWeek);
-        List<Event> events = [];
+    return LayoutBuilder(builder: (context, constraints) {
+      return RefreshIndicator(
+        onRefresh: () async {
+          await fetchData(startOfWeek).then((_) {
+            writeDataToStorage();
+          });
+        },
+        child: StoreConnector<AppState, AppState>(
+          converter: (store) => store.state,
+          builder: (context, state) {
+            DateFormat formatter = DateFormat('dd/MM/yyyy');
+            String key = formatter.format(startOfWeek);
+            List<Event> events = [];
 
-        DateTime currentMonday = DateTime.now().subtract(
-          Duration(
-            days: DateTime.now().weekday - 1,
-          ),
-        );
+            DateTime currentMonday = DateTime.now().subtract(
+              Duration(
+                days: DateTime.now().weekday - 1,
+              ),
+            );
 
-        bool isCurrentWeek = startOfWeek.day == currentMonday.day &&
-            startOfWeek.month == currentMonday.month &&
-            startOfWeek.year == currentMonday.year;
+            bool isCurrentWeek = startOfWeek.day == currentMonday.day &&
+                startOfWeek.month == currentMonday.month &&
+                startOfWeek.year == currentMonday.year;
 
-        if (state.events.containsKey(key)) {
-          events = state.events[key]!
-              .where((element) => element.day == weekday)
-              .toList()
-            ..sort();
-        } else {
-          loadWeekInterval(start: startOfWeek);
-        }
+            if (state.events.containsKey(key)) {
+              events = state.events[key]!
+                  .where((element) => element.day == weekday)
+                  .toList()
+                ..sort();
+            } else {
+              loadWeekInterval(start: startOfWeek);
+            }
 
-        if (events.isEmpty) {
-          return EmptyScheduleWidget(
-            onRefresh: () {
-              fetchData(startOfWeek).then((_) {
-                writeDataToStorage();
-              });
-            },
-          );
-        }
+            if (events.isEmpty) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: const EmptyScheduleWidget(),
+                ),
+              );
+            }
 
-        return RefreshIndicator(
-          onRefresh: () async {
-            await fetchData(startOfWeek).then((_) {
-              writeDataToStorage();
-            });
+            return ListView.builder(
+                itemCount: events.length,
+                padding: const EdgeInsets.all(20),
+                itemBuilder: (context, index) {
+                  // display break widget, if there is a time span longer than 15 minutes
+                  if (events.length > index + 1 &&
+                      events[index + 1].start.totalMinutes -
+                              events[index].end.totalMinutes >=
+                          15) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListItem(
+                          event: events[index],
+                          currentWeek: isCurrentWeek,
+                        ),
+                        const BreakWidget()
+                      ],
+                    );
+                  } else {
+                    return ListItem(
+                      event: events[index],
+                      currentWeek: isCurrentWeek,
+                    );
+                  }
+                });
           },
-          child: ListView.builder(
-              itemCount: events.length,
-              padding: const EdgeInsets.all(20),
-              itemBuilder: (context, index) {
-                // display break widget, if there is a time span longer than 15 minutes
-                if (events.length > index + 1 &&
-                    events[index + 1].start.totalMinutes -
-                            events[index].end.totalMinutes >=
-                        15) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListItem(
-                        event: events[index],
-                        currentWeek: isCurrentWeek,
-                      ),
-                      const BreakWidget()
-                    ],
-                  );
-                } else {
-                  return ListItem(
-                    event: events[index],
-                    currentWeek: isCurrentWeek,
-                  );
-                }
-              }),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
