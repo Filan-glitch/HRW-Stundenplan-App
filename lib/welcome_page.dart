@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:timetable/service/storage.dart';
+import 'package:yaml/yaml.dart';
 
-import 'dialogs/info_dialog.dart';
 import 'login_page.dart';
 import 'model/redux/store.dart';
 import 'model/redux/actions.dart' as redux;
+import 'privacy_page.dart';
 import 'service/network_fetch.dart';
 import 'widgets/page_wrapper.dart';
 
@@ -71,25 +73,57 @@ class WelcomePage extends StatelessWidget {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const InfoDialog(),
-                  barrierColor: Colors.transparent,
-                );
-              },
-              child: const Text("Über die App"),
-            ),
-            const Opacity(
-              opacity: 0.6,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 50.0),
-                child: Text(
-                  "Mit Nutzung dieser App akzeptieren Sie, dass etwaige Fehlermeldungen an Firebase Crashlytics gesendet werden.",
+            Column(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyPage(),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        Icons.admin_panel_settings,
+                        color: Colors.black54,
+                      ),
+                      Text("  Datenschutz"),
+                    ],
+                  ),
                 ),
-              ),
-            )
+                const Opacity(
+                  opacity: 0.6,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 50.0),
+                    child: Text(
+                      "Mit Nutzung dieser App akzeptieren Sie, dass etwaige Fehlermeldungen an Firebase Crashlytics gesendet werden.",
+                    ),
+                  ),
+                )
+              ],
+            ),
+            FutureBuilder(
+              future: rootBundle.loadString("pubspec.yaml"),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                    'Version: ${loadYaml(
+                      snapshot.data.toString(),
+                    )["version"].split("+")[0]}',
+                    style: const TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.black54,
+                    ),
+                    textAlign: TextAlign.center,
+                  );
+                }
+                return Container();
+              },
+            ),
           ],
         ),
       ),

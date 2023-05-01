@@ -3,16 +3,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:timetable/week_overview_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'dialogs/info_dialog.dart';
 import 'pdf_page.dart';
 import 'loading_page.dart';
-import 'model/redux/actions.dart' as redux;
 import 'model/event.dart';
 import 'model/redux/app_state.dart';
-import 'model/redux/store.dart';
+import 'settings_page.dart';
 import 'welcome_page.dart';
 import 'widgets/page_wrapper.dart';
-import 'service/storage.dart';
 import 'widgets/timetable.dart';
 import 'widgets/week_selector.dart';
 import 'widgets/weekday_selector.dart';
@@ -132,47 +129,18 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ListTile(
                   leading: Icon(
-                    Icons.lightbulb_outline,
+                    Icons.settings,
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  title: state.darkmode
-                      ? const Text("Helles Design")
-                      : const Text("Dunkles Design"),
+                  title: const Text("Einstellungen"),
                   onTap: () {
-                    store.dispatch(
-                      redux.Action(
-                        redux.ActionTypes.setDarkmode,
-                        payload: !state.darkmode,
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsPage(),
                       ),
                     );
-                    writeDarkmodeToStorage();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.info_outline,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  title: const Text("Info"),
-                  onTap: () {
-                    Navigator.pop(context);
-                    showDialog(
-                      context: context,
-                      builder: (context) => const InfoDialog(),
-                      barrierColor: Colors.transparent,
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.logout,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  title: const Text("Abmelden"),
-                  onTap: () {
-                    Navigator.pop(context);
-                    clearStorage();
-                    store.dispatch(redux.Action(redux.ActionTypes.clear));
                   },
                 ),
               ],
