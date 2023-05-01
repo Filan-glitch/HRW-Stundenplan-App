@@ -54,10 +54,6 @@ Future<void> fetchData(DateTime monday) async {
   } on SocketException {
     showToast('Keine Verbindung');
     store.dispatch(Action(ActionTypes.stopTask));
-  } on Error catch (e, stackTrace) {
-    showToast('Es ist ein Fehler aufgetreten');
-    store.dispatch(Action(ActionTypes.stopTask));
-    FirebaseCrashlytics.instance.recordError(e, stackTrace);
   } catch (e, stackTrace) {
     showToast('Es ist ein Fehler aufgetreten');
     store.dispatch(Action(ActionTypes.stopTask));

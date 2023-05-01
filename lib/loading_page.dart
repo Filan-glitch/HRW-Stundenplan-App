@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 
 class LoadingPage extends StatelessWidget {
   const LoadingPage({
+    this.title,
     super.key,
   });
+
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: title == null
+          ? null
+          : AppBar(
+              title: Text(title!),
+            ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

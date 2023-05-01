@@ -58,7 +58,7 @@ android {
     defaultConfig {
         
         applicationId "de.janbellenberg.timetable"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

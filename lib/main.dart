@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:timetable/loading_page.dart';
 import 'package:timetable/service/storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -106,7 +107,7 @@ class MyApp extends StatelessWidget {
             ],
             home: OKToast(
               position: ToastPosition.bottom,
-              child: state.dataLoaded ? const HomePage() : const Scaffold(),
+              child: state.dataLoaded ? const HomePage() : const LoadingPage(),
             ),
           );
         }),

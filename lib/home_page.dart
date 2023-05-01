@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PdfPage(
+                        builder: (context) => const PdfPage(
                           title: "Speiseplan",
                           url:
                               "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/aktuelle_woche.pdf",
@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PdfPage(
+                        builder: (context) => const PdfPage(
                           title: "Speiseplan",
                           url:
                               "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/naechste_woche.pdf",
