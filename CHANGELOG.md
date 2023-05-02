@@ -1,5 +1,4 @@
 # v1.2
-- HomeScreen Widget
 - Splash-Screen
 - Einstellungen
 - Bug fixes
