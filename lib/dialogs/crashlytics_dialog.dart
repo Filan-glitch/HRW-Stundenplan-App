@@ -38,9 +38,11 @@ class CrashlyticsDialog extends StatelessWidget {
                 child: const Text("Nein")),
           ],
         ),
-        const Text(
+        Text(
           "Deine Einstellung wird erst nach einem Neustart der App angewendet",
-          style: TextStyle(color: Colors.black54),
+          style: TextStyle(
+            color: Theme.of(context).dividerColor.withOpacity(0.6),
+          ),
         ),
       ],
     );
