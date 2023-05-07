@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">Stundenplan</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">HRW Stundenplan Homescreen Widget</string>
+    <string name="Heute">Heute</string>
+    <string name="Morgen">Morgen</string>
+    <string name="empty">Keine Veranstaltungen</string>
+    <string name="update">Update</string>
+</resources>

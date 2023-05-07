@@ -1,3 +1,6 @@
+# v1.3
+- Home Screen Widget
+
 # v1.2
 - Splash-Screen
 - Einstellungen

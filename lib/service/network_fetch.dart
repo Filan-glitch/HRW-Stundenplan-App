@@ -94,6 +94,13 @@ Future<List<Event>> _parse(dom.Document document) async {
 
     String? title = element.querySelector("a")?.attributes["title"];
 
+    // Lies den Text zwischen dem <a></a> Tag aus und speicher ihn in einer Variable abbr
+    String? abbr = element
+        .querySelector("a")
+        ?.text
+        .replaceAll("\t", "")
+        .replaceAll("\n", "");
+
     if (title == null) continue;
 
     String? weekday = element.attributes["abbr"] ?? "Montag";
@@ -101,6 +108,7 @@ Future<List<Event>> _parse(dom.Document document) async {
     Map<String, dynamic> event = {};
     event["title"] = title.trim();
     event["room"] = room.replaceAll(RegExp(r'\(\d+\)'), "").trim();
+    event["abbreviation"] = abbr;
 
     event["start"] = "${timePeriod[0].group(1)}:${timePeriod[0].group(2)}";
     event["end"] = "${timePeriod[0].group(3)}:${timePeriod[0].group(4)}";

@@ -1,29 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.janbellenberg.timetable">
-   <application
-        android:label="Stundenplan"
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:label="Stundenplan">
+        
+        <receiver
+            android:name=".TimetableAppWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/timetable_app_widget_info" />
+        </receiver>
+
+        <service android:name=".TimetableWidgetTodayService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service android:name=".TimetableWidgetTomorrowService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:screenOrientation="portrait"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
     </application>
-    <uses-permission android:name="android.permission.INTERNET"/>
+
 </manifest>

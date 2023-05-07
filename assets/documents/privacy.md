@@ -25,6 +25,7 @@ Bei der Anfrage an diese Server werden folgende Daten übermittelt und ggf. gesp
 Um die Stabilität und Zuverlässigkeit unserer Apps verbessern zu können, sind wir auf anonymisierte Absturzberichte angewiesen. Wir nutzen hierzu „Firebase Crashlytics“, ein Dienst der Google Ireland Ltd., Google Building Gordon House, Barrow Street, Dublin 4, Ireland.
 
 Im Falle eines Absturzes werden anonyme Informationen an die Server von Google in die USA übertragen (Zustand der App zum Zeitpunkt des Absturzes, Installation UUID, Crash-Trace, Hersteller und Betriebssystem des Handys, letzte Log-Meldungen). Diese Informationen enthalten keine personenbezogenen Daten.
+Die Übermittlung der Daten erfolgt nur, wenn der Benutzer aktiv zugestimmt hat.
 
 ## Daten löschen
 Durch das Abmelden aus der App werden folgende Daten gelöscht:

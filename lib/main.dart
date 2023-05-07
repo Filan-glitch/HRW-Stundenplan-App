@@ -8,11 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:timetable/loading_page.dart';
-import 'package:timetable/service/storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dialogs/crashlytics_dialog.dart';
 import 'firebase_options.dart';
 
+import 'loading_page.dart';
+import 'service/storage.dart';
 import 'service/update.dart';
 import 'themes/dark.dart';
 import 'home_page.dart';
@@ -65,11 +66,26 @@ void main() {
   runApp(const MyApp());
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static bool dialogShown = false;
 
   @override
   Widget build(BuildContext context) {
+    if (!dialogShown) {
+      dialogShown = true;
+      didShowCrashlyticsDialog().then((value) {
+        if (!value) {
+          showDialog(
+            context: navigatorKey.currentContext!,
+            builder: (context) => const CrashlyticsDialog(),
+          );
+        }
+      });
+    }
+
     return StoreProvider<AppState>(
       store: store,
       child: StoreConnector<AppState, AppState>(
@@ -101,6 +117,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             themeMode: state.darkmode ? ThemeMode.dark : ThemeMode.light,
             supportedLocales: const [Locale("de", "DE")],
+            navigatorKey: navigatorKey,
             localizationsDelegates: const [
               GlobalCupertinoLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
