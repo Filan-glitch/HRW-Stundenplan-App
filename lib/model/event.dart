@@ -2,6 +2,7 @@ import 'time.dart';
 
 class Event implements Comparable<Event> {
   late String title;
+  late String abbreviation;
   late Time start;
   late Time end;
   late String room;
@@ -24,6 +25,7 @@ class Event implements Comparable<Event> {
 
   Event({
     this.title = "",
+    this.abbreviation = "",
     this.start = const Time(0, 0),
     this.end = const Time(0, 0),
     this.room = "",
@@ -32,6 +34,7 @@ class Event implements Comparable<Event> {
 
   Event.fromAPI(Map<String, dynamic> data) {
     title = data["title"] ?? "";
+    abbreviation = data["abbreviation"] ?? "";
     room = data["room"] ?? "";
     day = Weekday.getByValue(data["weekday"] ?? 0);
 
@@ -49,6 +52,7 @@ class Event implements Comparable<Event> {
   Map<String, dynamic> toJSON() {
     return {
       "title": title,
+      "abbreviation": abbreviation,
       "room": room,
       "weekday": day.value,
       "start": "${start.hour}:${start.minute}",

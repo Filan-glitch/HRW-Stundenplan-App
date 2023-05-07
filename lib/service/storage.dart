@@ -32,7 +32,6 @@ Future<void> loadDataFromStorage() async {
       List<Event> eventsOnDay = [];
       for (dynamic event in parsed) {
         if (event is! Map<String, dynamic>) continue;
-
         eventsOnDay.add(Event.fromAPI(event));
       }
 
@@ -100,4 +99,14 @@ Future<void> loadDarkmode() async {
 
 Future<void> clearStorage() async {
   (await SharedPreferences.getInstance()).clear();
+}
+
+Future<void> crashlyticsDialogShown() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString("crashlyticsDialogShown", "1");
+}
+
+Future<bool> didShowCrashlyticsDialog() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.containsKey("crashlyticsDialogShown");
 }

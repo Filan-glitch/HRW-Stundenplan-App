@@ -6,6 +6,7 @@ import 'package:timetable/privacy_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
+import 'dialogs/crashlytics_dialog.dart';
 import 'model/redux/app_state.dart';
 import 'model/redux/actions.dart' as redux;
 import 'model/redux/store.dart';
@@ -56,7 +57,7 @@ class SettingsPage extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
                 child: Text(
-                  "Jan Bellenberg",
+                  "Jan Bellenberg\nFinn Dilan",
                   style: TextStyle(fontSize: 15.0),
                   textAlign: TextAlign.center,
                 ),
@@ -80,6 +81,18 @@ class SettingsPage extends StatelessWidget {
                       );
                       writeDarkmodeToStorage();
                     },
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.report,
+                ),
+                title: const Text("Crash-Daten"),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const CrashlyticsDialog(),
                   );
                 },
               ),
