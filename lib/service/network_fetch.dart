@@ -92,7 +92,7 @@ Future<List<Event>> _parse(dom.Document document) async {
         .replaceAll(RegExp(r'(\d{2}):(\d{2}) - (\d{2}):(\d{2})'), "")
         .trim();
 
-    String? title = element.querySelector("a")?.attributes["title"];
+    String? title = element.querySelector("a.link")?.attributes["title"];
 
     // Lies den Text zwischen dem <a></a> Tag aus und speicher ihn in einer Variable abbr
     String? abbr = element
