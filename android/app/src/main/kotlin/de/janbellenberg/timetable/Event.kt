@@ -1,12 +1,11 @@
 package de.janbellenberg.timetable
 
 class Event(
-        val title: String,
-        val abbreviation: String,
-        val start: String,
-        val end: String,
-        val room: String,
-        val day: Int
+    val title: String,
+    val abbreviation: String,
+    val start: String,
+    val end: String,
+    val room: String
 
 ) {
     override fun toString(): String {

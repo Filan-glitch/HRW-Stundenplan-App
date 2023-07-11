@@ -1,14 +1,18 @@
 /// List of actions, that are supported by the redux reducer function.
 enum ActionTypes {
   setEvents,
+  setGrades,
+  setCampus,
   clear,
   setDarkmode,
   setCredentials,
   startTask,
   stopTask,
   setupCompleted,
-  updateAvailable,
   showChangelog,
+  setLoginFormState,
+  setCurrentWeek,
+  setGPA,
 }
 
 /// Representation of a redux action with its [type] and optional [payload].

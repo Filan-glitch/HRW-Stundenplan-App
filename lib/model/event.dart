@@ -1,12 +1,16 @@
+import 'mode.dart';
 import 'time.dart';
+import 'weekday.dart';
 
 class Event implements Comparable<Event> {
-  late String title;
-  late String abbreviation;
-  late Time start;
-  late Time end;
-  late String room;
-  late Weekday day;
+  String get eventID => "$abbreviation$weekFrom";
+  String title;
+  String abbreviation;
+  Time start;
+  Time end;
+  String room;
+  Weekday day;
+  String weekFrom;
 
   Mode get mode {
     if (day.value == DateTime.now().weekday - 1) {
@@ -30,33 +34,34 @@ class Event implements Comparable<Event> {
     this.end = const Time(0, 0),
     this.room = "",
     this.day = Weekday.monday,
+    this.weekFrom = "",
   });
 
-  Event.fromAPI(Map<String, dynamic> data) {
-    title = data["title"] ?? "";
-    abbreviation = data["abbreviation"] ?? "";
-    room = data["room"] ?? "";
-    day = Weekday.getByValue(data["weekday"] ?? 0);
+  Event.fromDB(Map<String, dynamic> data)
+      : title = data["Title"] ?? "",
+        abbreviation = data["Abbreviation"] ?? "",
+        room = data["Room"] ?? "",
+        day = Weekday.getByValue(int.parse(data["Weekday"] ?? "0")),
+        weekFrom = data["WeekFrom"] ?? "",
+        start = Time(
+          int.parse(data["Start"]?.toString().split(":")[0] ?? "0"),
+          int.parse(data["Start"]?.toString().split(":")[1] ?? "0"),
+        ),
+        end = Time(
+          int.parse(data["End"]?.toString().split(":")[1] ?? "0"),
+          int.parse(data["End"]?.toString().split(":")[0] ?? "0"),
+        );
 
-    start = Time(
-      int.parse(data["start"]?.toString().split(":")[0] ?? "0"),
-      int.parse(data["start"]?.toString().split(":")[1] ?? "0"),
-    );
-
-    end = Time(
-      int.parse(data["end"]?.toString().split(":")[0] ?? "0"),
-      int.parse(data["end"]?.toString().split(":")[1] ?? "0"),
-    );
-  }
-
-  Map<String, dynamic> toJSON() {
+  Map<String, dynamic> toDB() {
     return {
-      "title": title,
-      "abbreviation": abbreviation,
-      "room": room,
-      "weekday": day.value,
-      "start": "${start.hour}:${start.minute}",
-      "end": "${end.hour}:${end.minute}",
+      "EventID": eventID,
+      "Title": title,
+      "Abbreviation": abbreviation,
+      "Room": room,
+      "Weekday": day.value.toString(),
+      "Start": "${start.hour}:${start.minute}",
+      "End": "${end.hour}:${end.minute}",
+      "WeekFrom": weekFrom,
     };
   }
 
@@ -65,39 +70,3 @@ class Event implements Comparable<Event> {
     return start.compareTo(other.start);
   }
 }
-
-enum Weekday {
-  monday(0),
-  tuesday(1),
-  wednesday(2),
-  thursday(3),
-  friday(4);
-
-  const Weekday(this.value);
-  final int value;
-  String get text {
-    switch (value) {
-      case 0:
-        return "Montag";
-      case 1:
-        return "Dienstag";
-      case 2:
-        return "Mittwoch";
-      case 3:
-        return "Donnerstag";
-      case 4:
-        return "Freitag";
-      default:
-        return "";
-    }
-  }
-
-  static Weekday getByValue(int value) {
-    return Weekday.values.firstWhere(
-      (x) => x.value == value,
-      orElse: () => Weekday.monday,
-    );
-  }
-}
-
-enum Mode { normal, active, done }

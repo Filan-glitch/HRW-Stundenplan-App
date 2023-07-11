@@ -45,4 +45,26 @@ app.*.map.json
 
 # Firebase
 firebase_options.dart
-google-services.json
+google-services.json!/assets/images/smartphone_screen1_1440x2560.png
+
+!/assets/images/smartphone_screen2_1440x2560.png
+
+!/assets/images/smartphone_screen3_1440x2560.png
+
+!/assets/images/smartphone_screen4_1440x2560.png
+
+!/assets/images/tablet7_screen1_1200x1920.png
+
+!/assets/images/tablet7_screen2_1200x1920.png
+
+!/assets/images/tablet7_screen3_1200x1920.png
+
+!/assets/images/tablet7_screen4_1200x1920.png
+
+!/assets/images/tablet10_screen1_1800x2560.png
+
+!/assets/images/tablet10_screen2_1800x2560.png
+
+!/assets/images/tablet10_screen3_1800x2560.png
+
+!/assets/images/vorstellungsgrafik_1024x500.png

@@ -1,68 +1,13 @@
-import 'dart:convert';
-
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:intl/intl.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-import '../model/event.dart';
+import '../model/campus.dart';
 import '../model/redux/actions.dart';
 import '../model/redux/store.dart';
 
-Future<void> loadDataFromStorage() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final RegExp dateRegExp = RegExp(r"\d{2}\/\d{2}\/\d{4}");
-
-  List<String> toDelete = [];
-
-  for (String date in prefs.getKeys()) {
-    try {
-      if (!dateRegExp.hasMatch(date)) continue;
-
-      // remove past events
-      DateFormat formatter = DateFormat('dd/MM/yyyy');
-      DateTime day = formatter.parse(date);
-      if (day.isBefore(DateTime.now().subtract(const Duration(days: 7)))) {
-        toDelete.add(date);
-        continue;
-      }
-
-      // parse events
-      List<dynamic> parsed = jsonDecode(prefs.getString(date) ?? "[]");
-      List<Event> eventsOnDay = [];
-      for (dynamic event in parsed) {
-        if (event is! Map<String, dynamic>) continue;
-        eventsOnDay.add(Event.fromAPI(event));
-      }
-
-      store.dispatch(Action(ActionTypes.setEvents, payload: {
-        "date": date,
-        "events": eventsOnDay,
-      }));
-    } catch (e, stackTrace) {
-      showToast('Es ist ein Fehler aufgetreten');
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
-      continue;
-    }
-  }
-
-  for (String date in toDelete) {
-    prefs.remove(date);
-  }
-}
-
-Future<void> writeDataToStorage() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  for (String date in store.state.events.keys) {
-    List<Map<String, dynamic>> data =
-        store.state.events[date]!.map((e) => e.toJSON()).toList();
-    String json = jsonEncode(data);
-    prefs.setString(date, json);
-  }
-}
-
-Future<void> writeCredentialsToStorage() async {
+Future<void> writeCredentials() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (store.state.args != null && store.state.cnsc != null) {
     prefs.setString("args", store.state.args!);
@@ -80,12 +25,12 @@ Future<void> loadCredentials() async {
   }
 }
 
-Future<void> writeDarkmodeToStorage() async {
+Future<void> writeDesign() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool("darkmode", store.state.darkmode);
 }
 
-Future<void> loadDarkmode() async {
+Future<void> loadDesign() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.containsKey("darkmode")) {
     store.dispatch(
@@ -97,8 +42,21 @@ Future<void> loadDarkmode() async {
   }
 }
 
-Future<void> clearStorage() async {
-  (await SharedPreferences.getInstance()).clear();
+Future<void> writeCampus() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString("campus", store.state.campus.text);
+}
+
+Future<void> loadCampus() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("campus")) {
+    store.dispatch(
+      Action(
+        ActionTypes.setCampus,
+        payload: Campus.getByValue(prefs.getString("campus")!),
+      ),
+    );
+  }
 }
 
 Future<void> crashlyticsDialogShown() async {
@@ -109,4 +67,38 @@ Future<void> crashlyticsDialogShown() async {
 Future<bool> didShowCrashlyticsDialog() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.containsKey("crashlyticsDialogShown");
+}
+
+Future<void> writeGPA() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setDouble("gpa", store.state.gpa);
+}
+
+Future<void> loadGPA() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("gpa")) {
+    store.dispatch(
+      Action(
+        ActionTypes.setGPA,
+        payload: prefs.getDouble("gpa"),
+      ),
+    );
+  }
+}
+
+Future<void> writeDownloadedRange(String monday) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString("downloadedRange", monday);
+}
+
+Future<String?> loadDownloadedRange() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString("downloadedRange");
+}
+
+Future<void> clearStorage() async {
+  (await SharedPreferences.getInstance()).clear();
+  String path = join(await getDatabasesPath(), "timetable.db");
+  await deleteDatabase(path);
+  CookieManager.instance().deleteAllCookies();
 }

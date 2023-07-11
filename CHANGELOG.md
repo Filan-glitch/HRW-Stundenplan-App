@@ -1,3 +1,9 @@
+# v1.4
+- Kalenderwochen
+- Prüfungsergebnisse
+- Mensa-Plan (Mülheim)
+- Bug fixes
+
 # v1.3
 - Home Screen Widget
 

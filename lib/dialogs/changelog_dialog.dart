@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yaml/yaml.dart';
 
+import '../model/constants.dart';
 import '../widgets/markdown_widget.dart';
 import '../widgets/dialog_wrapper.dart';
 
@@ -23,9 +24,8 @@ class ChangelogDialog extends StatelessWidget {
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
           width: MediaQuery.of(context).size.width * 0.9,
-          child: const MarkdownWidget(
-            source:
-                "https://gitlab.janbellenberg.de/janbellenberg/timetable/-/raw/main/CHANGELOG.md",
+          child: MarkdownWidget(
+            source: CHANGELOG_URL,
             isUrl: true,
           ),
         )

@@ -7,8 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf_render/pdf_render_widgets.dart';
 
-import 'loading_page.dart';
-
 class PdfPage extends StatefulWidget {
   const PdfPage({required this.url, this.title = "PDF Viewer", super.key});
   final String url;
@@ -80,7 +78,7 @@ class _PdfPageState extends State<PdfPage> {
     }
 
     return filePath == null
-        ? LoadingPage(title: widget.title)
+        ? Container()
         : Scaffold(
             appBar: AppBar(
               title: Text(widget.title),

@@ -5,6 +5,8 @@
     android:initialLayout="@layout/timetable_app_widget"
     android:minWidth="250dp"
     android:minHeight="250dp"
+    android:minResizeWidth="250dp"
+    android:minResizeHeight="100dp"
     android:previewImage="@drawable/example_appwidget_preview"
     android:previewLayout="@layout/timetable_app_widget"
     android:resizeMode="horizontal|vertical"

@@ -13,6 +13,8 @@ import 'dialogs/crashlytics_dialog.dart';
 import 'firebase_options.dart';
 
 import 'loading_page.dart';
+import 'service/db/events.dart';
+import 'service/db/grades.dart';
 import 'service/storage.dart';
 import 'service/update.dart';
 import 'themes/dark.dart';
@@ -53,13 +55,15 @@ void main() {
 
     Future.wait([
       loadCredentials(),
-      loadDataFromStorage(),
-      loadDarkmode(),
+      loadDataFromStorage().then((_) async {
+        await loadGradesFromStorage();
+      }),
+      loadGPA(),
+      loadDesign(),
+      loadCampus(),
     ]).then((value) {
       store.dispatch(redux.Action(redux.ActionTypes.setupCompleted));
     });
-
-    checkForUpdate();
     shouldShowChangelogIcon();
   });
 
@@ -125,7 +129,9 @@ class MyApp extends StatelessWidget {
             ],
             home: OKToast(
               position: ToastPosition.bottom,
-              child: state.dataLoaded ? const HomePage() : const LoadingPage(),
+              child: state.dataLoaded
+                  ? const HomePage()
+                  : const Scaffold(body: LoadingPage()),
             ),
           );
         }),
