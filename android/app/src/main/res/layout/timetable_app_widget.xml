@@ -1,46 +1,46 @@
     <!-- widget_layout.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/dark_background_color">
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="#2A313D"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/title_text_view"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/very_dark_background_color"
-            android:paddingStart="10sp"
-            android:paddingTop="7sp"
-            android:paddingEnd="0sp"
-            android:text="@string/appwidget_text"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/last_update_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@color/very_dark_background_color"
-            android:padding="8dp"
-            android:textAlignment="viewEnd"
-            android:textColor="@color/light_blue_50"
-            android:textSize="12sp"
-            tools:text="Stand:" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/title_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#191D24"
+                android:paddingStart="10sp"
+                android:paddingTop="7sp"
+                android:paddingEnd="0sp"
+                android:text="@string/appwidget_text"
+                android:textColor="@color/light_blue_50"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/last_update_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="#191D24"
+                android:padding="8dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/light_blue_50"
+                android:textSize="12sp"
+                tools:text="Stand:" />
+        </LinearLayout>
 
     <TextView
         android:id="@+id/today_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/very_dark_background_color"
+        android:background="#191D24"
         android:paddingStart="8dp"
         android:paddingLeft="8dp"
         android:paddingTop="1dp"
@@ -53,58 +53,57 @@
         android:textStyle="bold" />
 
 
-    <FrameLayout
-        android:id="@+id/today_frame_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        >
+        <FrameLayout
+            android:id="@+id/today_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/today_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty"
+                android:textColor="@color/light_blue_50"
+                android:textSize="18sp" />
+
+            <ListView
+                android:id="@+id/today_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
 
         <TextView
-            android:id="@+id/today_empty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/empty"
-            android:textSize="18sp"
-            android:textColor="@color/light_blue_50" />
-
-        <ListView
-            android:id="@+id/today_list_view"
+            android:id="@+id/tomorrow_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/tomorrow_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/light_blue_50"
-        android:background="@color/very_dark_background_color"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="@string/Morgen"
-        android:padding="8dp"/>
-
-    <FrameLayout
-        android:id="@+id/tomorrow_frame_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
-
-        <TextView
-            android:id="@+id/tomorrow_empty"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/empty"
-            android:textSize="18sp"
-            android:textColor="@color/light_blue_50" />
+            android:background="#191D24"
+            android:padding="8dp"
+            android:text="@string/Morgen"
+            android:textColor="@color/light_blue_50"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-        <ListView
-            android:id="@+id/tomorrow_list_view"
+        <FrameLayout
+            android:id="@+id/tomorrow_frame_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="8dp">
 
-    </FrameLayout>
+            <TextView
+                android:id="@+id/tomorrow_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty"
+                android:textColor="@color/light_blue_50"
+                android:textSize="18sp" />
 
-</LinearLayout>
+            <ListView
+                android:id="@+id/tomorrow_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
+    </LinearLayout>

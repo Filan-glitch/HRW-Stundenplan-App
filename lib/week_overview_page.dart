@@ -5,6 +5,7 @@ import 'package:timetable/widgets/empty_schedule.dart';
 
 import 'model/event.dart';
 import 'model/redux/app_state.dart';
+import 'model/weekday.dart';
 import 'widgets/list_item.dart';
 
 class WeekOverviewPage extends StatelessWidget {
@@ -62,7 +63,6 @@ class WeekOverviewPage extends StatelessWidget {
                           itemCount: events.length,
                           itemBuilder: (context, index) {
                             return ListItem(
-                              currentWeek: false,
                               event: events[index],
                             );
                           },

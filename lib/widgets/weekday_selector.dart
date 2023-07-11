@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-import '../model/event.dart';
+import '../model/weekday.dart';
 
 class WeekdaySelectorWidget extends StatelessWidget {
   const WeekdaySelectorWidget(

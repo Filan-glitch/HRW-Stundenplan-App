@@ -14,9 +14,16 @@ class WeekSelectorWidget extends StatelessWidget {
 
   final DateFormat formatter = DateFormat('dd.MM.yyyy');
 
+  int calculateWeekNumber(DateTime date) {
+    final dayOfYear = date.difference(DateTime(date.year, 1, 1)).inDays;
+    final weekNumber = ((dayOfYear - date.weekday + 10) / 7).floor();
+    return weekNumber;
+  }
+
   @override
   Widget build(BuildContext context) {
     DateTime lastDay = firstDayOfWeek.add(const Duration(days: 6));
+    int weekNumber = calculateWeekNumber(firstDayOfWeek);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -33,7 +40,9 @@ class WeekSelectorWidget extends StatelessWidget {
         TextButton(
           onPressed: onHome,
           child: Text(
-              "${formatter.format(firstDayOfWeek)} - ${formatter.format(lastDay)}"),
+            "${formatter.format(firstDayOfWeek)} - ${formatter.format(lastDay)}\nKW $weekNumber",
+            textAlign: TextAlign.center,
+          ),
         ),
         IconButton(
           onPressed: () {
