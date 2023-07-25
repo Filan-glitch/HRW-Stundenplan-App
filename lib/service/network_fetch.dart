@@ -257,7 +257,11 @@ Future<List<Module>> _parseGrades(dom.Document document) async {
 }
 
 Future<double> _parseGPA(dom.Document document) async {
-  var data = document.querySelectorAll(
-      'table.nb.list.students_results th.tbsubhead[style="text-align:right;"]');
-  return double.parse(data[1].text.trimLeft().replaceAll(",", "."));
+  try {
+    var data = document.querySelectorAll(
+        'table.nb.list.students_results th.tbsubhead[style="text-align:right;"]');
+    return double.parse(data[1].text.trimLeft().replaceAll(",", "."));
+  } on FormatException {
+    return 0.0;
+  }
 }

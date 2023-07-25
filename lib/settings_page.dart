@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:mutex/mutex.dart';
-import 'package:timetable/dialogs/changelog_dialog.dart';
-import 'package:timetable/privacy_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
+import 'model/biometrics.dart';
+import 'dialogs/changelog_dialog.dart';
 import 'dialogs/crashlytics_dialog.dart';
 import 'dialogs/select_campus_dialog.dart';
+import 'dialogs/select_lock_dialog.dart';
 import 'login_page.dart';
 import 'model/constants.dart';
-import 'model/redux/app_state.dart';
 import 'model/redux/actions.dart' as redux;
+import 'model/redux/app_state.dart';
 import 'model/redux/store.dart';
 import 'service/db/events.dart';
 import 'service/db/grades.dart';
@@ -108,18 +110,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           LoginPage.performLogin(onLoginSuccess: _loadData);
                         }),
                     ListTile(
-                      leading: const Icon(
-                        Icons.report,
-                      ),
-                      title: const Text("Crash-Daten"),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const CrashlyticsDialog(),
-                        );
-                      },
-                    ),
-                    ListTile(
                       leading: const Icon(Icons.school),
                       title: Text(
                         "Campus: ${state.campus.text}",
@@ -131,11 +121,71 @@ class _SettingsPageState extends State<SettingsPage> {
                         );
                       },
                     ),
+                    FutureBuilder(
+                      future: Future.wait([
+                        LocalAuthentication().canCheckBiometrics,
+                        LocalAuthentication().isDeviceSupported(),
+                      ]),
+                      builder: (context, snapshot) {
+                        if (snapshot.data?[0] == true &&
+                            snapshot.data?[1] == true) {
+                          return ListTile(
+                            leading: const Icon(Icons.security),
+                            title: Row(
+                              children: [
+                                const Text(
+                                  "Biometrie: ",
+                                ),
+                                if (state.biometrics == Biometrics.OFF)
+                                  const Text("Nicht aktiv"),
+                                if (state.biometrics == Biometrics.ON)
+                                  const Text("Aktiv"),
+                                if (state.biometrics ==
+                                    Biometrics.ONLY_EXAM_RESULTS)
+                                  const Text("Prüfungsergebnisse"),
+                              ],
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const SelectLockDialog(),
+                              );
+                            },
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.report,
+                      ),
+                      title: const Text("Crashlytics-Zustimmung"),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const CrashlyticsDialog(),
+                        );
+                      },
+                    ),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Divider(
                         color: Color.fromARGB(255, 117, 117, 117),
                       ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.badge),
+                      title: const Text("Offizielles CampusNet"),
+                      onTap: () {
+                        launchUrl(
+                          Uri.parse(
+                            CAMPUS_URL,
+                          ),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
                     ),
                     ListTile(
                       leading: const Icon(Icons.update),
@@ -155,6 +205,30 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                     ListTile(
+                      leading: const Icon(Icons.local_police),
+                      title: const Text("Disclaimer"),
+                      onTap: () {
+                        launchUrl(
+                          Uri.parse(
+                            DISCLAIMER_URL,
+                          ),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.admin_panel_settings),
+                      title: const Text("Datenschutz"),
+                      onTap: () {
+                        launchUrl(
+                          Uri.parse(
+                            PRIVACY_URL,
+                          ),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                    ),
+                    ListTile(
                       leading: const Icon(Icons.code),
                       title: const Text("Quellcode"),
                       onTap: () {
@@ -167,24 +241,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(Icons.bug_report),
+                      leading: const Icon(Icons.feedback),
                       title: const Text("Feedback"),
                       onTap: () {
                         launchUrl(
                           Uri.parse(
                             FEEDBACK_URL,
-                          ),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.admin_panel_settings),
-                      title: const Text("Datenschutz"),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PrivacyPage(),
                           ),
                         );
                       },

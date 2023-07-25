@@ -39,9 +39,15 @@ class _PdfPageState extends State<PdfPage> {
           File pdf = File(path);
           await pdf.writeAsBytes(response.bodyBytes);
 
-          setState(() {
-            filePath = path;
-          });
+          try {
+            setState(() {
+              filePath = path;
+            });
+          } catch (e) {
+            // page was left, before download was completed
+            pdf.delete();
+            return;
+          }
         } on TimeoutException {
           setState(() {
             hasError = true;

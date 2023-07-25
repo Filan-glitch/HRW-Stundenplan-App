@@ -13,7 +13,9 @@ Future<Database> openDB() async {
     path,
     version: DB_VERSION,
     onCreate: (Database database, int version) async {
-      dbInit.forEach((element) async => await database.execute(element));
+      for(int i = 0; i < dbInit.length; i++) {
+        await database.execute(dbInit[i]);
+      }
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
       log("Upgrading database from version $oldVersion to $newVersion");

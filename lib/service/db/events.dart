@@ -26,9 +26,9 @@ Future<void> loadDataFromStorage() async {
       ),
     );
 
-    String? _mon = await loadDownloadedRange();
-    if (_mon != null) {
-      DateTime lastFetchedWeek = formatter.parse(_mon);
+    String? mon = await loadDownloadedRange();
+    if (mon != null) {
+      DateTime lastFetchedWeek = formatter.parse(mon);
 
       while (!lastFetchedWeek.isBefore(currentMonday)) {
         events[formatter.format(currentMonday)] = [];

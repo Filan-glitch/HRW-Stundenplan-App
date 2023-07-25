@@ -48,8 +48,8 @@ class Event implements Comparable<Event> {
           int.parse(data["Start"]?.toString().split(":")[1] ?? "0"),
         ),
         end = Time(
-          int.parse(data["End"]?.toString().split(":")[1] ?? "0"),
           int.parse(data["End"]?.toString().split(":")[0] ?? "0"),
+          int.parse(data["End"]?.toString().split(":")[1] ?? "0"),
         );
 
   Map<String, dynamic> toDB() {

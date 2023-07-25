@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../model/biometrics.dart';
 import '../model/campus.dart';
 import '../model/redux/actions.dart';
 import '../model/redux/store.dart';
@@ -94,6 +95,23 @@ Future<void> writeDownloadedRange(String monday) async {
 Future<String?> loadDownloadedRange() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString("downloadedRange");
+}
+
+Future<void> writeBiometrics() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt("biometrics", store.state.biometrics.index);
+}
+
+Future<void> loadBiometrics() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("biometrics")) {
+    store.dispatch(
+      Action(
+        ActionTypes.setBiometricsType,
+        payload: Biometrics.values[prefs.getInt("biometrics")!],
+      ),
+    );
+  }
 }
 
 Future<void> clearStorage() async {

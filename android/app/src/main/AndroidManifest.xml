@@ -3,6 +3,7 @@
     package="de.janbellenberg.timetable">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
     <application
         android:name="${applicationName}"
