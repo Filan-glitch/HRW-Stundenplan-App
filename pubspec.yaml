@@ -3,7 +3,7 @@ description: Stundenplan
 
 publish_to: "none"
 
-version: 1.4.1+1
+version: 1.4.1+2
 
 environment:
   sdk: ">=2.19.4 <3.0.0"
