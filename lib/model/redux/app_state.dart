@@ -1,3 +1,4 @@
+import '../biometrics.dart';
 import '../campus.dart';
 import '../event.dart';
 import '../login_state.dart';
@@ -11,6 +12,8 @@ class AppState {
   bool showChangelog = false;
   LoginFormState loginFormState = LoginFormState.notShown;
   Campus campus = Campus.muelheim;
+  Biometrics biometrics = Biometrics.OFF;
+  bool appLocked = false;
 
   String? cnsc, args;
   Map<String, List<Event>> events = {};

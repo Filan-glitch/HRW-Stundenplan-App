@@ -1,3 +1,4 @@
+import '../biometrics.dart';
 import '../campus.dart';
 import 'actions.dart';
 import 'app_state.dart';
@@ -16,6 +17,8 @@ AppState appReducer(AppState state, dynamic action) {
     state.modules = [];
     state.gpa = 0;
     state.campus = Campus.muelheim;
+    state.biometrics = Biometrics.OFF;
+    state.appLocked = false;
   } else if (action.type == ActionTypes.setDarkmode) {
     state.darkmode = action.payload;
   } else if (action.type == ActionTypes.setCredentials) {
@@ -39,6 +42,10 @@ AppState appReducer(AppState state, dynamic action) {
     state.gpa = action.payload;
   } else if (action.type == ActionTypes.setCampus) {
     state.campus = action.payload;
+  } else if (action.type == ActionTypes.setBiometricsType) {
+    state.biometrics = action.payload;
+  } else if (action.type == ActionTypes.setLockState) {
+    state.appLocked = action.payload;
   }
   return state;
 }

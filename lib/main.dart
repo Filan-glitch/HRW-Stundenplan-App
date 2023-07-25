@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'api/firebase_api.dart';
 import 'dialogs/crashlytics_dialog.dart';
 import 'firebase_options.dart';
 
 import 'loading_page.dart';
+import 'model/biometrics.dart';
 import 'service/db/events.dart';
 import 'service/db/grades.dart';
 import 'service/storage.dart';
@@ -29,7 +32,7 @@ void main() {
 
   Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  ).then((value) {
+  ).then((value) async {
     FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
 
     if (!kDebugMode) {
@@ -51,6 +54,17 @@ void main() {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
       };
+    }
+    await FirebaseApi().initNotifications();
+
+    await loadBiometrics();
+    if (store.state.biometrics == Biometrics.ON) {
+      store.dispatch(
+        redux.Action(
+          redux.ActionTypes.setLockState,
+          payload: true,
+        ),
+      );
     }
 
     Future.wait([
@@ -113,6 +127,21 @@ class MyApp extends StatelessWidget {
             DeviceOrientation.portraitUp,
             DeviceOrientation.portraitDown,
           ]);
+
+          if (state.appLocked && state.biometrics == Biometrics.ON) {
+            LocalAuthentication()
+                .authenticate(
+              localizedReason: 'Bitte App entsperren',
+            )
+                .then((success) {
+              if (success) {
+                store.dispatch(redux.Action(
+                  redux.ActionTypes.setLockState,
+                  payload: false,
+                ));
+              }
+            });
+          }
 
           return MaterialApp(
             title: 'Stundenplan',

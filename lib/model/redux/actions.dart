@@ -13,6 +13,8 @@ enum ActionTypes {
   setLoginFormState,
   setCurrentWeek,
   setGPA,
+  setLockState,
+  setBiometricsType,
 }
 
 /// Representation of a redux action with its [type] and optional [payload].

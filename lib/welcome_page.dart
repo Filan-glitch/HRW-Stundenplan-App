@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timetable/service/storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
 import 'login_page.dart';
-import 'privacy_page.dart';
+import 'model/constants.dart';
 import 'service/db/grades.dart';
 import 'service/network_fetch.dart';
 
@@ -22,7 +23,17 @@ class WelcomePage extends StatelessWidget {
           const Column(
             children: [
               Text("Willkommen!", style: TextStyle(fontSize: 30.0)),
-              Text("bei der inoffiziellen", style: TextStyle(fontSize: 20.0)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("bei der ", style: TextStyle(fontSize: 20.0)),
+                  Text("inoffiziellen",
+                      style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic)),
+                ],
+              ),
               Text(
                 "CampusNet",
                 style: TextStyle(
@@ -59,11 +70,11 @@ class WelcomePage extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PrivacyPage(),
+                  launchUrl(
+                    Uri.parse(
+                      PRIVACY_URL,
                     ),
+                    mode: LaunchMode.externalApplication,
                   );
                 },
                 child: const Row(
