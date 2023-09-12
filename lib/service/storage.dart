@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 
 import '../model/biometrics.dart';
 import '../model/campus.dart';
+import '../model/timetable_view.dart';
 import '../model/redux/actions.dart';
 import '../model/redux/store.dart';
 
@@ -109,6 +110,46 @@ Future<void> loadBiometrics() async {
       Action(
         ActionTypes.setBiometricsType,
         payload: Biometrics.values[prefs.getInt("biometrics")!],
+      ),
+    );
+  }
+}
+
+Future<void> writeNotificationsEnabled() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool("notificationsEnabled", store.state.notificationsEnabled);
+}
+
+Future<void> loadNotificationsEnabled() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("notificationsEnabled")) {
+    store.dispatch(
+      Action(
+        ActionTypes.setNotificationsEnabled,
+        payload: prefs.getBool("notificationsEnabled"),
+      ),
+    );
+  }
+}
+
+Future<void> writeDefaultView() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt("defaultView", store.state.defaultView.index);
+}
+
+Future<void> loadDefaultView() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("defaultView")) {
+    store.dispatch(
+      Action(
+        ActionTypes.setDefaultView,
+        payload: TimetableView.values[prefs.getInt("defaultView")!],
+      ),
+    );
+    store.dispatch(
+      Action(
+        ActionTypes.setView,
+        payload: TimetableView.values[prefs.getInt("defaultView")!],
       ),
     );
   }

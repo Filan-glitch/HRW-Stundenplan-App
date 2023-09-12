@@ -1,16 +1,22 @@
+import 'dart:io';
+
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mutex/mutex.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:timetable/dialogs/changelog_dialog.dart';
+import 'package:timetable/model/biometrics.dart';
+import 'package:timetable/service/background.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
-import 'model/biometrics.dart';
-import 'dialogs/changelog_dialog.dart';
 import 'dialogs/crashlytics_dialog.dart';
 import 'dialogs/select_campus_dialog.dart';
+import 'dialogs/select_default_view.dart';
 import 'dialogs/select_lock_dialog.dart';
 import 'login_page.dart';
 import 'model/constants.dart';
@@ -121,6 +127,66 @@ class _SettingsPageState extends State<SettingsPage> {
                         );
                       },
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.view_comfortable_rounded),
+                      title: Text(
+                        "Startansicht: ${state.defaultView.text}",
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const SelectDefaultViewDialog(),
+                        );
+                      },
+                    ),
+                    if (Platform.isAndroid)
+                      ListTile(
+                        leading: const Icon(
+                          Icons.lightbulb,
+                        ),
+                        title: state.notificationsEnabled
+                            ? const Text("Benachrichtigungen: aktiviert")
+                            : const Text("Benachrichtigungen: deaktiviert"),
+                        onTap: () {
+                          bool newValue = !state.notificationsEnabled;
+
+                          if (newValue) {
+                            registerBackgroundService();
+                            showToast(
+                              "Aufgrund von Batterie-Optimierung werden Benachrichtigungen ggf. nicht immer korrekt angezeigt.",
+                              duration: const Duration(seconds: 5),
+                            );
+                          } else {
+                            unregisterBackgroundService();
+                          }
+
+                          store.dispatch(
+                            redux.Action(
+                              redux.ActionTypes.setNotificationsEnabled,
+                              payload: newValue,
+                            ),
+                          );
+                          writeNotificationsEnabled();
+                        },
+                      ),
+                    FutureBuilder(
+                      future: DisableBatteryOptimization
+                          .isBatteryOptimizationDisabled,
+                      builder: (context, snapshot) {
+                        if (snapshot.data == false && Platform.isAndroid) {
+                          return ListTile(
+                            leading: const Icon(Icons.battery_alert),
+                            title: const Text("Akku-Optimierung deaktivieren"),
+                            onTap: () {
+                              DisableBatteryOptimization
+                                  .showDisableBatteryOptimizationSettings();
+                            },
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
                     FutureBuilder(
                       future: Future.wait([
                         LocalAuthentication().canCheckBiometrics,
@@ -142,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   const Text("Aktiv"),
                                 if (state.biometrics ==
                                     Biometrics.ONLY_EXAM_RESULTS)
-                                  const Text("Prüfungsergebnisse"),
+                                  const Text("Nur Prüfungsergebnisse"),
                               ],
                             ),
                             onTap: () {

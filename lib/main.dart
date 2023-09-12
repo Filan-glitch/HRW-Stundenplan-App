@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,23 +10,24 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:timetable/service/background.dart';
+import 'package:workmanager/workmanager.dart';
+
 import 'api/firebase_api.dart';
 import 'dialogs/crashlytics_dialog.dart';
 import 'firebase_options.dart';
-
+import 'home_page.dart';
 import 'loading_page.dart';
 import 'model/biometrics.dart';
+import 'model/redux/actions.dart' as redux;
+import 'model/redux/app_state.dart';
+import 'model/redux/store.dart';
 import 'service/db/events.dart';
 import 'service/db/grades.dart';
 import 'service/storage.dart';
 import 'service/update.dart';
 import 'themes/dark.dart';
-import 'home_page.dart';
 import 'themes/light.dart';
-import 'model/redux/app_state.dart';
-import 'model/redux/store.dart';
-import 'model/redux/actions.dart' as redux;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +69,11 @@ void main() {
       );
     }
 
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
+
     Future.wait([
       loadCredentials(),
       loadDataFromStorage().then((_) async {
@@ -75,8 +82,12 @@ void main() {
       loadGPA(),
       loadDesign(),
       loadCampus(),
+      loadNotificationsEnabled(),
+      loadDefaultView(),
     ]).then((value) {
       store.dispatch(redux.Action(redux.ActionTypes.setupCompleted));
+
+      if (store.state.notificationsEnabled) registerBackgroundService();
     });
     shouldShowChangelogIcon();
   });

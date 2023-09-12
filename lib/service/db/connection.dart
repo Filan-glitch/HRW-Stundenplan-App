@@ -13,7 +13,12 @@ Future<Database> openDB() async {
     path,
     version: DB_VERSION,
     onCreate: (Database database, int version) async {
-      for(int i = 0; i < dbInit.length; i++) {
+      for (int i = 0; i < dbInit.length; i++) {
+        await database.execute(dbInit[i]);
+      }
+    },
+    onOpen: (Database database) async {
+      for (int i = 0; i < dbInit.length; i++) {
         await database.execute(dbInit[i]);
       }
     },

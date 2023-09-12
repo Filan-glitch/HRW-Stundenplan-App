@@ -15,6 +15,9 @@ enum ActionTypes {
   setGPA,
   setLockState,
   setBiometricsType,
+  setNotificationsEnabled,
+  setView,
+  setDefaultView
 }
 
 /// Representation of a redux action with its [type] and optional [payload].

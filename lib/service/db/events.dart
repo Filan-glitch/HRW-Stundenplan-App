@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../model/date_time_calculator.dart';
 import '../../model/event.dart';
 import '../../model/redux/actions.dart';
 import '../../model/redux/store.dart';
+import '../../model/weekday.dart';
 import '../storage.dart';
 import 'connection.dart';
 
@@ -18,17 +20,13 @@ Future<void> loadDataFromStorage() async {
     Map<String, List<Event>> events = {};
 
     // fill empty weeks
-    DateTime currentMonday =
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-            .subtract(
-      Duration(
-        days: DateTime.now().weekday - 1,
-      ),
+    DateTime currentMonday = DateTimeCalculator.getFirstDayOfWeek(
+      DateTimeCalculator.clean(DateTime.now()),
     );
 
     String? mon = await loadDownloadedRange();
     if (mon != null) {
-      DateTime lastFetchedWeek = formatter.parse(mon);
+      DateTime lastFetchedWeek = DateTimeCalculator.clean(formatter.parse(mon));
 
       while (!lastFetchedWeek.isBefore(currentMonday)) {
         events[formatter.format(currentMonday)] = [];
@@ -116,5 +114,36 @@ Future<void> writeDataToStorage() async {
       print(stackTrace);
     }
     FirebaseCrashlytics.instance.recordError(e, stackTrace);
+  }
+}
+
+Future<List<Event>> getNextEvents() async {
+  late Database db;
+  try {
+    db = await openDB();
+    List<Map<String, dynamic>> result = await db.query('Events');
+
+    DateFormat formatter = DateFormat('dd/MM/yyyy');
+    int rangeStart = DateTime.now().hour * 60 + DateTime.now().minute;
+    int rangeEnd = DateTime.now().hour * 60 + DateTime.now().minute + 20;
+    DateTime monday =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+            .subtract(
+      Duration(
+        days: DateTime.now().weekday - 1,
+      ),
+    );
+
+    return result
+        .map(Event.fromDB)
+        .where((element) =>
+            formatter.parse(element.weekFrom).isAtSameMomentAs(monday))
+        .where((element) =>
+            element.day == Weekday.getByValue(DateTime.now().weekday - 1))
+        .where((element) => element.start.totalMinutes > rangeStart)
+        .where((element) => element.start.totalMinutes < rangeEnd)
+        .toList();
+  } finally {
+    await db.close();
   }
 }

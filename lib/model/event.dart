@@ -66,6 +66,11 @@ class Event implements Comparable<Event> {
   }
 
   @override
+  String toString() {
+    return "$title in $room von $start bis $end";
+  }
+
+  @override
   int compareTo(Event other) {
     return start.compareTo(other.start);
   }

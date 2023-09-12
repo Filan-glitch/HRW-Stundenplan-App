@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "177253641824-thkkukupu17p370v45jppgrtovi71qvl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.janbellenberg.timetable",
+            "certificate_hash": "3734b8c4b87260ebf7de146bfce94671ef3bf3ca"
+          }
+        },
+        {
           "client_id": "177253641824-62si6kbgklpidg9l8j806s6mdcvscgd3.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "177253641824-62si6kbgklpidg9l8j806s6mdcvscgd3.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "177253641824-r3qorti6svl8pbalbugvktv933oopmi8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.janbellenberg.timetable"
+              }
             }
           ]
         }
