@@ -3,7 +3,7 @@ description: Stundenplan
 
 publish_to: "none"
 
-version: 1.4.1+2
+version: 1.5.0+3
 
 environment:
   sdk: ">=2.19.4 <3.0.0"
@@ -36,6 +36,9 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   local_auth: ^2.1.6
   firebase_messaging: ^14.6.5
+  flutter_local_notifications: ^15.1.0+1
+  workmanager: ^0.5.1
+  disable_battery_optimization: ^1.1.0+1
 
 dev_dependencies:
   flutter_test:

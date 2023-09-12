@@ -1,5 +1,7 @@
 import '../biometrics.dart';
 import '../campus.dart';
+import '../date_time_calculator.dart';
+import '../timetable_view.dart';
 import 'actions.dart';
 import 'app_state.dart';
 
@@ -18,6 +20,8 @@ AppState appReducer(AppState state, dynamic action) {
     state.gpa = 0;
     state.campus = Campus.muelheim;
     state.biometrics = Biometrics.OFF;
+    state.currentView = TimetableView.daily;
+    state.defaultView = TimetableView.daily;
     state.appLocked = false;
   } else if (action.type == ActionTypes.setDarkmode) {
     state.darkmode = action.payload;
@@ -35,7 +39,7 @@ AppState appReducer(AppState state, dynamic action) {
   } else if (action.type == ActionTypes.setLoginFormState) {
     state.loginFormState = action.payload;
   } else if (action.type == ActionTypes.setCurrentWeek) {
-    state.currentWeek = action.payload;
+    state.currentWeek = DateTimeCalculator.clean(action.payload);
   } else if (action.type == ActionTypes.setGrades) {
     state.modules = action.payload;
   } else if (action.type == ActionTypes.setGPA) {
@@ -46,6 +50,12 @@ AppState appReducer(AppState state, dynamic action) {
     state.biometrics = action.payload;
   } else if (action.type == ActionTypes.setLockState) {
     state.appLocked = action.payload;
+  } else if (action.type == ActionTypes.setNotificationsEnabled) {
+    state.notificationsEnabled = action.payload;
+  } else if (action.type == ActionTypes.setView) {
+    state.currentView = action.payload;
+  } else if (action.type == ActionTypes.setDefaultView) {
+    state.defaultView = action.payload;
   }
   return state;
 }

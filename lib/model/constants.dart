@@ -1,6 +1,4 @@
 const int DB_VERSION = 1;
-const String CHANGELOG_URL =
-    "https://gitlab.janbellenberg.de/janbellenberg/timetable/-/raw/main/CHANGELOG.md";
 const String BASE_URL = "https://campusnet.hs-ruhrwest.de/scripts/mgrqispi.dll";
 const String LOGIN_URL =
     "https://dsf.hs-ruhrwest.de/IdentityServer/connect/authorize?client_id=ClassicWeb&scope=openid%20DSF&response_mode=query&response_type=code&nonce=kQEKs7lCwN2CEXvCDeD1Zw==&redirect_uri=https%3A%2F%2Fcampusnet.hs-ruhrwest.de%2Fscripts%2Fmgrqispi.dll%3FAPPNAME%3DCampusNet%26PRGNAME%3DLOGINCHECK%26ARGUMENTS%3D-N000000000000001%2Cids_mode%26ids_mode%3DY";

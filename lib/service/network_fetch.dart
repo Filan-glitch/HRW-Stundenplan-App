@@ -5,25 +5,28 @@ import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../model/constants.dart';
+import '../model/date_time_calculator.dart';
 import '../model/event.dart';
+import '../model/module.dart';
 import '../model/redux/actions.dart';
 import '../model/redux/store.dart';
 import '../model/time.dart';
 import '../model/weekday.dart';
 import 'db/events.dart';
-import '../model/module.dart';
 
 Future<void> loadWeekInterval({DateTime? start, int weeks = 6}) {
   start ??= DateTime.now();
 
-  start = start.subtract(Duration(days: start.weekday - 1));
+  start = DateTimeCalculator.getFirstDayOfWeek(
+    DateTimeCalculator.clean(start),
+  );
 
   List<Future<void>> tasks = [
     for (int i = 0; i < weeks; i++)
@@ -167,11 +170,25 @@ Future<List<Event>> _parseTimetable(
         .allMatches(details)
         .toList();
 
-    String room = element
-        .querySelectorAll(".timePeriod a")
-        // ignore: unnecessary_string_escapes
-        .map((e) => e.text.replaceAll(RegExp("\(\d+\)"), "").trim())
-        .join(", ");
+    String room;
+
+    if (element.querySelectorAll(".timePeriod a").isEmpty) {
+      // Variante 1
+      var allText = element.text.trim();
+      var texts = allText.split('\n').map((e) => e.trim()).toList();
+
+      if (texts.length > 1) {
+        room = texts[1].replaceAll(RegExp("\(\d+\)"), "").trim();
+      } else {
+        room = ""; // Für den Fall, dass das Format unerwartet ist
+      }
+    } else {
+      // Variante 2
+      room = element
+          .querySelectorAll(".timePeriod a")
+          .map((e) => e.text.replaceAll(RegExp("\(\d+\)"), "").trim())
+          .join(", ");
+    }
 
     String? title = element.querySelector("a.link")?.attributes["title"];
 

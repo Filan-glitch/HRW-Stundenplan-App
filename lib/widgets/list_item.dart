@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import '../model/date_time_calculator.dart';
 import '../model/event.dart';
 import '../model/mode.dart';
 import '../model/redux/app_state.dart';
@@ -38,10 +39,8 @@ class _ListItemState extends State<ListItem> {
     return StoreConnector<AppState, AppState>(
         converter: (store) => store.state,
         builder: (context, state) {
-          DateTime currentMonday = DateTime.now().subtract(
-            Duration(
-              days: DateTime.now().weekday - 1,
-            ),
+          DateTime currentMonday = DateTimeCalculator.getFirstDayOfWeek(
+            DateTimeCalculator.clean(DateTime.now()),
           );
 
           bool isCurrentWeek = state.currentWeek.day == currentMonday.day &&

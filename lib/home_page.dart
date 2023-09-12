@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:timetable/grades_overview_page.dart';
-import 'package:timetable/week_overview_page.dart';
 
 import 'dialogs/changelog_dialog.dart';
+import 'grades_overview_page.dart';
 import 'model/campus.dart';
 import 'model/constants.dart';
+import 'model/date_time_calculator.dart';
+import 'model/timetable_view.dart';
 import 'model/redux/actions.dart' as redux;
 import 'model/redux/store.dart';
 import 'model/weekday.dart';
 import 'pdf_page.dart';
 import 'model/redux/app_state.dart';
 import 'settings_page.dart';
+import 'widgets/month_overview.dart';
 import 'widgets/page_wrapper.dart';
 import 'widgets/timetable.dart';
+import 'widgets/week_overview.dart';
 import 'widgets/week_selector.dart';
 import 'widgets/weekday_selector.dart';
 
@@ -32,9 +35,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    DateTime currentWeek = DateTime.now().subtract(Duration(
-      days: DateTime.now().weekday - 1,
-    ));
+    DateTime currentWeek = DateTimeCalculator.getFirstDayOfWeek(
+      DateTimeCalculator.clean(DateTime.now()),
+    );
 
     if (DateTime.now().weekday < 6) {
       _activePage = Weekday.getByValue(DateTime.now().weekday - 1);
@@ -53,13 +56,35 @@ class _HomePageState extends State<HomePage> {
     return StoreConnector<AppState, AppState>(
         converter: (store) => store.state,
         builder: (context, state) {
-          return PageWrapper(
-            bottomNavigationBar: WeekdaySelectorWidget(
+          Widget content = Container();
+
+          if (state.currentView == TimetableView.daily) {
+            content = TimetableWidget(
               weekday: _activePage,
-              onChanged: (weekday) => setState(() {
-                _activePage = weekday;
-              }),
-            ),
+            );
+          } else if (state.currentView == TimetableView.weekly) {
+            content = WeekOverview(
+              firstDayOfWeek: state.currentWeek,
+            );
+          } else if (state.currentView == TimetableView.monthly) {
+            content = MonthOverviewWidget(
+              onSelectedDayChanged: (dayOfWeek) {
+                setState(() {
+                  _activePage = Weekday.getByValue(dayOfWeek);
+                });
+              },
+            );
+          }
+
+          return PageWrapper(
+            bottomNavigationBar: state.currentView == TimetableView.daily
+                ? WeekdaySelectorWidget(
+                    weekday: _activePage,
+                    onChanged: (weekday) => setState(() {
+                      _activePage = weekday;
+                    }),
+                  )
+                : null,
             actions: [
               if (state.showChangelog)
                 IconButton(
@@ -85,24 +110,51 @@ class _HomePageState extends State<HomePage> {
                 ),
             ],
             menuActions: [
-              ListTile(
-                leading: Icon(
-                  Icons.calendar_month,
-                  color: Theme.of(context).colorScheme.primary,
+              if (state.currentView != TimetableView.daily)
+                ListTile(
+                  leading: Icon(
+                    Icons.calendar_view_day,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Tagesübersicht"),
+                  onTap: () {
+                    store.dispatch(redux.Action(
+                      redux.ActionTypes.setView,
+                      payload: TimetableView.daily,
+                    ));
+                    Navigator.pop(context);
+                  },
                 ),
-                title: const Text("Wochenübersicht"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WeekOverviewPage(
-                        firstDayOfWeek: state.currentWeek,
-                      ),
-                    ),
-                  );
-                },
-              ),
+              if (state.currentView != TimetableView.weekly)
+                ListTile(
+                  leading: Icon(
+                    Icons.view_week,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Wochenübersicht"),
+                  onTap: () {
+                    store.dispatch(redux.Action(
+                      redux.ActionTypes.setView,
+                      payload: TimetableView.weekly,
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
+              if (state.currentView != TimetableView.monthly)
+                ListTile(
+                  leading: Icon(
+                    Icons.calendar_month,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text("Monatsübersicht"),
+                  onTap: () {
+                    store.dispatch(redux.Action(
+                      redux.ActionTypes.setView,
+                      payload: TimetableView.monthly,
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
               ListTile(
                 leading: Icon(
                   Icons.fastfood,
@@ -187,10 +239,8 @@ class _HomePageState extends State<HomePage> {
                     onHome: () {
                       store.dispatch(redux.Action(
                         redux.ActionTypes.setCurrentWeek,
-                        payload: DateTime.now().subtract(
-                          Duration(
-                            days: DateTime.now().weekday - 1,
-                          ),
+                        payload: DateTimeCalculator.getFirstDayOfWeek(
+                          DateTimeCalculator.clean(DateTime.now()),
                         ),
                       ));
 
@@ -223,9 +273,7 @@ class _HomePageState extends State<HomePage> {
                         previousDay();
                       }
                     },
-                    child: TimetableWidget(
-                      weekday: _activePage,
-                    ),
+                    child: content,
                   ),
                 ),
               ],
@@ -235,41 +283,59 @@ class _HomePageState extends State<HomePage> {
   }
 
   void nextDay() {
-    if (_activePage == Weekday.friday) {
+    if (store.state.currentView == TimetableView.daily) {
+      if (_activePage == Weekday.friday) {
+        store.dispatch(redux.Action(
+          redux.ActionTypes.setCurrentWeek,
+          payload: store.state.currentWeek.add(
+            const Duration(days: 7),
+          ),
+        ));
+
+        setState(() {
+          _activePage = Weekday.monday;
+        });
+      } else {
+        setState(() {
+          _activePage = Weekday.getByValue(_activePage.value + 1);
+        });
+      }
+    } else if (store.state.currentView == TimetableView.weekly) {
       store.dispatch(redux.Action(
         redux.ActionTypes.setCurrentWeek,
         payload: store.state.currentWeek.add(
           const Duration(days: 7),
         ),
       ));
-
-      setState(() {
-        _activePage = Weekday.monday;
-      });
-    } else {
-      setState(() {
-        _activePage = Weekday.getByValue(_activePage.value + 1);
-      });
     }
   }
 
   void previousDay() {
-    if (_activePage == Weekday.monday &&
-        store.state.currentWeek.isAfter(DateTime.now())) {
+    if (store.state.currentView == TimetableView.daily) {
+      if (_activePage == Weekday.monday &&
+          store.state.currentWeek.isAfter(DateTime.now())) {
+        store.dispatch(redux.Action(
+          redux.ActionTypes.setCurrentWeek,
+          payload: store.state.currentWeek.subtract(
+            const Duration(days: 7),
+          ),
+        ));
+
+        setState(() {
+          _activePage = Weekday.friday;
+        });
+      } else {
+        setState(() {
+          _activePage = Weekday.getByValue(_activePage.value - 1);
+        });
+      }
+    } else if (store.state.currentView == TimetableView.weekly) {
       store.dispatch(redux.Action(
         redux.ActionTypes.setCurrentWeek,
         payload: store.state.currentWeek.subtract(
           const Duration(days: 7),
         ),
       ));
-
-      setState(() {
-        _activePage = Weekday.friday;
-      });
-    } else {
-      setState(() {
-        _activePage = Weekday.getByValue(_activePage.value - 1);
-      });
     }
   }
 }

@@ -3,9 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yaml/yaml.dart';
 
-import '../model/constants.dart';
-import '../widgets/markdown_widget.dart';
 import '../widgets/dialog_wrapper.dart';
+import '../widgets/markdown_widget.dart';
 
 class ChangelogDialog extends StatelessWidget {
   ChangelogDialog({super.key}) {
@@ -25,8 +24,8 @@ class ChangelogDialog extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.8,
           width: MediaQuery.of(context).size.width * 0.9,
           child: const MarkdownWidget(
-            source: CHANGELOG_URL,
-            isUrl: true,
+            source: "CHANGELOG.md",
+            isUrl: false,
           ),
         )
       ],
