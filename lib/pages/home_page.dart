@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'dialogs/changelog_dialog.dart';
+import '../dialogs/changelog_dialog.dart';
+import '../dialogs/confirm_refresh_dialog.dart';
+import '../model/campus.dart';
+import '../model/constants.dart';
+import '../model/date_time_calculator.dart';
+import '../model/redux/actions.dart' as redux;
+import '../model/redux/app_state.dart';
+import '../model/redux/store.dart';
+import '../model/timetable_view.dart';
+import '../model/weekday.dart';
+import '../service/network_fetch.dart';
+import '../themes/dark.dart';
+import '../themes/light.dart';
+import '../widgets/month_overview.dart';
+import '../widgets/page_wrapper.dart';
+import '../widgets/timetable.dart';
+import '../widgets/week_overview.dart';
+import '../widgets/week_selector.dart';
+import '../widgets/weekday_selector.dart';
 import 'grades_overview_page.dart';
-import 'model/campus.dart';
-import 'model/constants.dart';
-import 'model/date_time_calculator.dart';
-import 'model/timetable_view.dart';
-import 'model/redux/actions.dart' as redux;
-import 'model/redux/store.dart';
-import 'model/weekday.dart';
+import 'login_page.dart';
 import 'pdf_page.dart';
-import 'model/redux/app_state.dart';
 import 'settings_page.dart';
-import 'widgets/month_overview.dart';
-import 'widgets/page_wrapper.dart';
-import 'widgets/timetable.dart';
-import 'widgets/week_overview.dart';
-import 'widgets/week_selector.dart';
-import 'widgets/weekday_selector.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -56,6 +62,21 @@ class _HomePageState extends State<HomePage> {
     return StoreConnector<AppState, AppState>(
         converter: (store) => store.state,
         builder: (context, state) {
+          SystemChrome.setSystemUIOverlayStyle(
+            SystemUiOverlayStyle(
+              statusBarColor: state.effectiveTheme == ThemeMode.dark
+                  ? darkTheme.colorScheme.primary
+                  : lightTheme.colorScheme.primary,
+              statusBarBrightness: Brightness.light,
+              systemNavigationBarColor: state.effectiveTheme == ThemeMode.dark
+                  ? darkTheme.colorScheme.background
+                  : lightTheme.colorScheme.background,
+              systemNavigationBarIconBrightness:
+                  state.effectiveTheme == ThemeMode.dark
+                      ? Brightness.light
+                      : Brightness.dark,
+            ),
+          );
           Widget content = Container();
 
           if (state.currentView == TimetableView.daily) {
@@ -110,6 +131,13 @@ class _HomePageState extends State<HomePage> {
                 ),
             ],
             menuActions: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0),
+                child: Text(
+                  "Zuletzt aktualisiert: ${state.lastUpdated ?? "Nie"}",
+                  style: TextStyle(fontSize: 12.0),
+                ),
+              ),
               if (state.currentView != TimetableView.daily)
                 ListTile(
                   leading: Icon(
@@ -273,7 +301,19 @@ class _HomePageState extends State<HomePage> {
                         previousDay();
                       }
                     },
-                    child: content,
+                    child: RefreshIndicator(
+                      child: content,
+                      onRefresh: () async {
+                        if (store.state.enableConfirmRefreshDialog) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const ConfirmRefreshDialog(),
+                          );
+                        } else {
+                          LoginPage.performLogin(onLoginSuccess: reloadAll);
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],

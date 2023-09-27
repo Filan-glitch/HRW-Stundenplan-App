@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
-import 'model/redux/store.dart';
-import 'model/redux/actions.dart' as redux;
+import '../model/redux/actions.dart' as redux;
+import '../model/redux/store.dart';
 
 class BiometricsPage extends StatelessWidget {
   const BiometricsPage({super.key});
@@ -25,10 +25,17 @@ class BiometricsPage extends StatelessWidget {
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await LocalAuthentication().stopAuthentication();
                     LocalAuthentication()
                         .authenticate(
                       localizedReason: 'Bitte App entsperren',
+                      options: const AuthenticationOptions(
+                        stickyAuth: true,
+                        sensitiveTransaction: false,
+                        biometricOnly: true,
+                        useErrorDialogs: false,
+                      ),
                     )
                         .then((success) {
                       if (success) {

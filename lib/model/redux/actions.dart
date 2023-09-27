@@ -4,7 +4,7 @@ enum ActionTypes {
   setGrades,
   setCampus,
   clear,
-  setDarkmode,
+  setDesign,
   setCredentials,
   startTask,
   stopTask,
@@ -17,7 +17,10 @@ enum ActionTypes {
   setBiometricsType,
   setNotificationsEnabled,
   setView,
-  setDefaultView
+  setDefaultView,
+  setAccount,
+  setLastUpdated,
+  setEnableConfirmRefreshDialog,
 }
 
 /// Representation of a redux action with its [type] and optional [payload].

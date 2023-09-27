@@ -10,7 +10,7 @@ class ChangelogDialog extends StatelessWidget {
   ChangelogDialog({super.key}) {
     SharedPreferences.getInstance().then((prefs) async {
       String pubspec = await rootBundle.loadString("pubspec.yaml");
-      String appVersion = loadYaml(pubspec)["version"].split("+")[0];
+      String appVersion = loadYaml(pubspec)["version"].split("+").first;
       prefs.setString("latestChangelogShownVersion", appVersion);
     });
   }

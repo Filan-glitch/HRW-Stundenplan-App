@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:timetable/service/db/migrate.dart';
 
 import '../../model/constants.dart';
+import 'migrate.dart';
 
 Future<Database> openDB() async {
   String databasesPath = await getDatabasesPath();

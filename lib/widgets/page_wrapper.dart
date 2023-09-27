@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:timetable/loading_page.dart';
-import 'package:timetable/login_page.dart';
-import 'package:timetable/model/biometrics.dart';
 
-import '../biometrics_page.dart';
+import '../model/biometrics.dart';
 import '../model/login_state.dart';
-import '../model/redux/app_state.dart';
 import '../model/redux/actions.dart' as redux;
+import '../model/redux/app_state.dart';
 import '../model/redux/store.dart';
-import '../welcome_page.dart';
+import '../pages/biometrics_page.dart';
+import '../pages/loading_page.dart';
+import '../pages/login_page.dart';
+import '../pages/welcome_page.dart';
 import 'action_menu.dart';
 
-class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
+class PageWrapper extends StatefulWidget {
   PageWrapper({
     required this.body,
     this.bottomNavigationBar,
@@ -23,8 +23,31 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
     this.canGoBack = false,
     this.simpleDesign = false,
     super.key,
-  }) {
+  });
+
+  final Widget body;
+  final Widget? bottomNavigationBar;
+  final List<Widget> menuActions;
+  final List<Widget> actions;
+  final String title;
+  final bool canGoBack;
+  final bool simpleDesign;
+
+  @override
+  State<PageWrapper> createState() => _PageWrapperState();
+}
+
+class _PageWrapperState extends State<PageWrapper> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -41,27 +64,32 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
     }
   }
 
-  final Widget body;
-  final Widget? bottomNavigationBar;
-  final List<Widget> menuActions;
-  final List<Widget> actions;
-  final String title;
-  final bool canGoBack;
-  final bool simpleDesign;
+  @override
+  void didChangePlatformBrightness() {
+    if (store.state.activeTheme == ThemeMode.system) {
+      store.dispatch(
+        redux.Action(
+          redux.ActionTypes.setDesign,
+          payload: ThemeMode.system,
+        ),
+      );
+    }
+    super.didChangePlatformBrightness();
+  }
 
   @override
   Widget build(BuildContext context) {
     Widget mainContent;
-    if (simpleDesign) {
+    if (widget.simpleDesign) {
       mainContent = Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Text(widget.title),
         ),
-        body: body,
+        body: widget.body,
       );
     } else {
       mainContent = Scaffold(
-        bottomNavigationBar: bottomNavigationBar,
+        bottomNavigationBar: widget.bottomNavigationBar,
         body: Container(
           color: Theme.of(context).colorScheme.primary,
           child: StoreConnector<AppState, AppState>(
@@ -77,7 +105,7 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          if (canGoBack)
+                          if (widget.canGoBack)
                             IconButton(
                               padding: const EdgeInsets.all(0),
                               icon: const Icon(
@@ -93,7 +121,7 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
                                 horizontal: 20.0,
                               ),
                               child: Text(
-                                title,
+                                widget.title,
                                 overflow: TextOverflow.fade,
                                 maxLines: 1,
                                 softWrap: false,
@@ -104,10 +132,10 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
                               ),
                             ),
                           ),
-                          if (menuActions.isNotEmpty)
+                          if (widget.menuActions.isNotEmpty)
                             Row(
                               children: [
-                                ...actions,
+                                ...widget.actions,
                                 IconButton(
                                   padding: const EdgeInsets.all(0),
                                   icon: const Icon(
@@ -132,7 +160,7 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
                             topRight: Radius.circular(30.0),
                           ),
                         ),
-                        child: body,
+                        child: widget.body,
                       ),
                     ),
                   ],
@@ -175,7 +203,7 @@ class PageWrapper extends StatelessWidget with WidgetsBindingObserver {
       constraints: const BoxConstraints(maxWidth: 400.0),
       builder: (context) => ActionMenu(
         children: [
-          ...menuActions,
+          ...widget.menuActions,
         ],
       ),
       barrierColor: Colors.transparent,

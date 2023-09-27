@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 
-import '../login_page.dart';
 import '../model/event.dart';
 import '../model/redux/app_state.dart';
 import '../model/redux/store.dart';
 import '../model/weekday.dart';
+import '../pages/login_page.dart';
 import '../service/db/events.dart';
 import '../service/network_fetch.dart';
 import 'break.dart';
@@ -55,9 +55,18 @@ class TimetableWidget extends StatelessWidget {
             );
           }
 
+          for (int i = 0; i < events.length - 1; i++) {
+            for (int j = i + 1; j < events.length; j++) {
+              if (events.elementAt(i).isCollidingWith(events.elementAt(j))) {
+                events[i].collision = true;
+                events[j].collision = true;
+              }
+            }
+          }
+
           return ListView.builder(
               itemCount: events.length,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(10),
               itemBuilder: (context, index) {
                 // display break widget, if there is a time span longer than 15 minutes
                 if (events.length > index + 1 &&

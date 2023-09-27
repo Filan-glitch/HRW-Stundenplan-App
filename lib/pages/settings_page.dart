@@ -3,31 +3,33 @@ import 'dart:io';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mutex/mutex.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:timetable/dialogs/changelog_dialog.dart';
-import 'package:timetable/model/biometrics.dart';
-import 'package:timetable/service/background.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
-import 'dialogs/crashlytics_dialog.dart';
-import 'dialogs/select_campus_dialog.dart';
-import 'dialogs/select_default_view.dart';
-import 'dialogs/select_lock_dialog.dart';
+import '../dialogs/changelog_dialog.dart';
+import '../dialogs/crashlytics_dialog.dart';
+import '../dialogs/select_campus_dialog.dart';
+import '../dialogs/select_default_view.dart';
+import '../dialogs/select_design_dialog.dart';
+import '../dialogs/select_lock_dialog.dart';
+import '../model/biometrics.dart';
+import '../model/constants.dart';
+import '../model/redux/actions.dart' as redux;
+import '../model/redux/app_state.dart';
+import '../model/redux/store.dart';
+import '../service/background.dart';
+import '../service/db/events.dart';
+import '../service/db/grades.dart';
+import '../service/network_fetch.dart';
+import '../service/storage.dart';
+import '../widgets/page_wrapper.dart';
 import 'login_page.dart';
-import 'model/constants.dart';
-import 'model/redux/actions.dart' as redux;
-import 'model/redux/app_state.dart';
-import 'model/redux/store.dart';
-import 'service/db/events.dart';
-import 'service/db/grades.dart';
-import 'service/network_fetch.dart';
-import 'service/storage.dart';
-import 'widgets/page_wrapper.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -55,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 30.0, bottom: 50.0),
+                      padding: const EdgeInsets.only(top: 30.0, bottom: 40.0),
                       child: SizedBox(
                         height: 75.0,
                         child: Image.asset(
@@ -82,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                     const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
                       child: Text(
                         "Jan Bellenberg\nFinn Dilan",
                         style: TextStyle(fontSize: 15.0),
@@ -91,32 +93,48 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     ListTile(
                       leading: const Icon(
-                        Icons.lightbulb,
+                        Icons.account_circle_sharp,
                       ),
-                      title: state.darkmode
-                          ? const Text("Helles Design")
-                          : const Text("Dunkles Design"),
-                      onTap: () {
-                        store.dispatch(
-                          redux.Action(
-                            redux.ActionTypes.setDarkmode,
-                            payload: !state.darkmode,
-                          ),
-                        );
-                        writeDesign();
-                      },
+                      title: Text(
+                        "Angemeldet als: ${state.account ?? "Unbekannter Account"}",
+                        style: const TextStyle(fontSize: 15),
+                      ),
                     ),
                     ListTile(
                         leading: const Icon(
-                          Icons.download,
+                          Icons.sync_outlined,
                         ),
                         title: const Text("Daten aktualisieren"),
                         onTap: () {
                           _isLoading = false;
                           LoginPage.performLogin(onLoginSuccess: _loadData);
                         }),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Divider(
+                        color: Color.fromARGB(255, 117, 117, 117),
+                      ),
+                    ),
                     ListTile(
-                      leading: const Icon(Icons.school),
+                      leading: Icon(
+                        state.effectiveTheme == ThemeMode.dark
+                            ? Icons.lightbulb_outline
+                            : Icons.lightbulb,
+                      ),
+                      title: state.activeTheme == ThemeMode.system
+                          ? const Text("Design: System")
+                          : state.effectiveTheme == ThemeMode.dark
+                              ? const Text("Design: Dunkel")
+                              : const Text("Design: Hell"),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const SelectDesignDialog(),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.location_on),
                       title: Text(
                         "Campus: ${state.campus.text}",
                       ),
@@ -142,7 +160,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (Platform.isAndroid)
                       ListTile(
                         leading: const Icon(
-                          Icons.lightbulb,
+                          Icons.notifications_active,
                         ),
                         title: state.notificationsEnabled
                             ? const Text("Benachrichtigungen: aktiviert")
@@ -152,6 +170,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
                           if (newValue) {
                             registerBackgroundService();
+
+                            // request permission
+                            FlutterLocalNotificationsPlugin
+                                flutterLocalNotificationsPlugin =
+                                FlutterLocalNotificationsPlugin();
+                            flutterLocalNotificationsPlugin
+                                .resolvePlatformSpecificImplementation<
+                                    AndroidFlutterLocalNotificationsPlugin>()
+                                ?.requestPermission();
+
                             showToast(
                               "Aufgrund von Batterie-Optimierung werden Benachrichtigungen ggf. nicht immer korrekt angezeigt.",
                               duration: const Duration(seconds: 5),
@@ -169,63 +197,81 @@ class _SettingsPageState extends State<SettingsPage> {
                           writeNotificationsEnabled();
                         },
                       ),
-                    FutureBuilder(
-                      future: DisableBatteryOptimization
-                          .isBatteryOptimizationDisabled,
-                      builder: (context, snapshot) {
-                        if (snapshot.data == false && Platform.isAndroid) {
-                          return ListTile(
-                            leading: const Icon(Icons.battery_alert),
-                            title: const Text("Akku-Optimierung deaktivieren"),
-                            onTap: () {
-                              DisableBatteryOptimization
-                                  .showDisableBatteryOptimizationSettings();
-                            },
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
+                    if (Platform.isAndroid)
+                      FutureBuilder(
+                        future: DisableBatteryOptimization
+                            .isBatteryOptimizationDisabled,
+                        builder: (context, snapshot) {
+                          if (snapshot.data == false) {
+                            return ListTile(
+                              leading: const Icon(Icons.battery_alert),
+                              title:
+                                  const Text("Akku-Optimierung deaktivieren"),
+                              onTap: () {
+                                DisableBatteryOptimization
+                                    .showDisableBatteryOptimizationSettings();
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
                     FutureBuilder(
                       future: Future.wait([
                         LocalAuthentication().canCheckBiometrics,
                         LocalAuthentication().isDeviceSupported(),
+                        LocalAuthentication().getAvailableBiometrics(),
                       ]),
-                      builder: (context, snapshot) {
-                        if (snapshot.data?[0] == true &&
-                            snapshot.data?[1] == true) {
-                          return ListTile(
-                            leading: const Icon(Icons.security),
-                            title: Row(
-                              children: [
-                                const Text(
-                                  "Biometrie: ",
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasError) {
+                            return Text("Fehler: ${snapshot.error}");
+                          } else {
+                            bool canCheckBiometrics = snapshot.data[0];
+                            bool isDeviceSupported = snapshot.data[1];
+                            List<BiometricType> availableBiometrics =
+                                snapshot.data[2];
+                            if (canCheckBiometrics &&
+                                isDeviceSupported &&
+                                availableBiometrics.isNotEmpty) {
+                              return ListTile(
+                                leading: const Icon(Icons.security),
+                                title: Row(
+                                  children: [
+                                    const Text(
+                                      "Biometrie: ",
+                                    ),
+                                    if (state.biometrics == Biometrics.OFF)
+                                      const Text("Nicht aktiv"),
+                                    if (state.biometrics == Biometrics.ON)
+                                      const Text("Aktiv"),
+                                    if (state.biometrics ==
+                                        Biometrics.ONLY_EXAM_RESULTS)
+                                      const Text("Nur Prüfungsergebnisse"),
+                                  ],
                                 ),
-                                if (state.biometrics == Biometrics.OFF)
-                                  const Text("Nicht aktiv"),
-                                if (state.biometrics == Biometrics.ON)
-                                  const Text("Aktiv"),
-                                if (state.biometrics ==
-                                    Biometrics.ONLY_EXAM_RESULTS)
-                                  const Text("Nur Prüfungsergebnisse"),
-                              ],
-                            ),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const SelectLockDialog(),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        const SelectLockDialog(),
+                                  );
+                                },
                               );
-                            },
-                          );
+                            } else {
+                              return Container();
+                            }
+                          }
                         } else {
-                          return Container();
+                          return const CircularProgressIndicator();
                         }
                       },
                     ),
                     ListTile(
                       leading: const Icon(
-                        Icons.report,
+                        Icons.bug_report,
                       ),
                       title: const Text("Crashlytics-Zustimmung"),
                       onTap: () {
@@ -233,6 +279,21 @@ class _SettingsPageState extends State<SettingsPage> {
                           context: context,
                           builder: (context) => const CrashlyticsDialog(),
                         );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.question_answer),
+                      title: Text(
+                        "Vor dem Aktualisieren fragen: ${state.enableConfirmRefreshDialog ? "Ja" : "Nein"}",
+                      ),
+                      onTap: () {
+                        store.dispatch(
+                          redux.Action(
+                            redux.ActionTypes.setEnableConfirmRefreshDialog,
+                            payload: !state.enableConfirmRefreshDialog,
+                          ),
+                        );
+                        writeEnableConfirmRefreshDialog();
                       },
                     ),
                     const Padding(
@@ -271,7 +332,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(Icons.local_police),
+                      leading: const Icon(Icons.error),
                       title: const Text("Disclaimer"),
                       onTap: () {
                         launchUrl(
@@ -352,11 +413,13 @@ class _SettingsPageState extends State<SettingsPage> {
           .map((week) => fetchTimetableData(formatter.parse(week)))
           .toList();
       futures.add(fetchGradeData());
+      futures.add(fetchAccountData());
       await Future.wait(futures);
 
       await writeDataToStorage();
       await writeGradesToStorage();
       await writeGPA();
+      await writeAccount();
     } finally {
       m.release();
     }

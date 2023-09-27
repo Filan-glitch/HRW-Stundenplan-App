@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:markdown_widget/markdown_widget.dart' as renderer;
 import 'package:http/http.dart' as http;
+import 'package:markdown_widget/markdown_widget.dart' as renderer;
 
 class MarkdownWidget extends StatelessWidget {
   const MarkdownWidget({
@@ -18,7 +18,7 @@ class MarkdownWidget extends StatelessWidget {
     return FutureBuilder(
       future: isUrl
           ? http.get(Uri.parse(source))
-          : rootBundle.loadString("assets/documents/$source"),
+          : rootBundle.loadString(source, cache: true),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) return Container();

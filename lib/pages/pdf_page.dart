@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:pdf_render/pdf_render_widgets.dart';
 
 class PdfPage extends StatefulWidget {
@@ -45,7 +45,9 @@ class _PdfPageState extends State<PdfPage> {
             });
           } catch (e) {
             // page was left, before download was completed
-            pdf.delete();
+            if (await pdf.exists()) {
+              await pdf.delete();
+            }
             return;
           }
         } on TimeoutException {
@@ -67,11 +69,12 @@ class _PdfPageState extends State<PdfPage> {
       getTemporaryDirectory().then(
         (tempDir) async {
           File pdf = File(filePath!);
-          await pdf.delete();
+          if (await pdf.exists()) {
+            await pdf.delete();
+          }
         },
       );
     }
-
     super.dispose();
   }
 
@@ -92,7 +95,7 @@ class _PdfPageState extends State<PdfPage> {
             body: GestureDetector(
               onDoubleTapDown: (details) => doubleTapDetails = details,
               onDoubleTap: () => controller.ready?.setZoomRatio(
-                zoomRatio: controller.zoomRatio * 1.5,
+                zoomRatio: controller.zoomRatio > 2.0 ? 1.0 : 2.5,
                 center: doubleTapDetails!.localPosition,
               ),
               child: PdfViewer.openFile(

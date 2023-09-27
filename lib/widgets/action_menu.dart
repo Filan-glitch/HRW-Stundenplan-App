@@ -16,7 +16,7 @@ class ActionMenu extends StatelessWidget {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
       child: Container(
-        height: children.length * 56 + 70,
+        height: children.length * 56 + 40,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),

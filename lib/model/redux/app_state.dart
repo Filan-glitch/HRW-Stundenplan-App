@@ -1,31 +1,48 @@
+import 'package:flutter/material.dart';
+
 import '../biometrics.dart';
 import '../campus.dart';
 import '../date_time_calculator.dart';
-import '../timetable_view.dart';
 import '../event.dart';
 import '../login_state.dart';
 import '../module.dart';
+import '../timetable_view.dart';
 
 class AppState {
-  bool darkmode = false;
+  ThemeMode activeTheme = ThemeMode.system;
   bool dataLoaded = false;
   int runningTasks = 0;
   bool get loading => runningTasks > 0;
   bool showChangelog = false;
   LoginFormState loginFormState = LoginFormState.notShown;
+  bool appLocked = false;
+  late DateTime currentWeek;
+
   Campus campus = Campus.muelheim;
   Biometrics biometrics = Biometrics.OFF;
   TimetableView currentView = TimetableView.daily;
   TimetableView defaultView = TimetableView.daily;
-  bool appLocked = false;
   bool notificationsEnabled = false;
+  bool enableConfirmRefreshDialog = true;
+  String? lastUpdated;
 
+  String? account;
   String? cnsc, args;
   Map<String, List<Event>> events = {};
-  late DateTime currentWeek;
 
   List<Module> modules = [];
   double gpa = 0;
+
+  ThemeMode get effectiveTheme {
+    if (activeTheme == ThemeMode.system) {
+      return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark
+          ? ThemeMode.dark
+          : ThemeMode.light;
+    } else {
+      return activeTheme;
+    }
+  }
 
   AppState() {
     currentWeek = DateTimeCalculator.getFirstDayOfWeek(

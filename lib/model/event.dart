@@ -11,22 +11,23 @@ class Event implements Comparable<Event> {
   String room;
   Weekday day;
   String weekFrom;
+  bool? collision;
 
-  Mode get mode {
-    if (day.value == DateTime.now().weekday - 1) {
-      Time now = Time(DateTime.now().hour, DateTime.now().minute);
-      if (start.compareTo(now) <= 0 && end.compareTo(now) >= 0) {
-        return Mode.active;
-      } else if (end.compareTo(now) <= 0) {
-        return Mode.done;
-      } else {
-        return Mode.normal;
-      }
-    } else {
-      return Mode.normal;
-    }
-  }
-
+  // Mode get mode {
+  //   if (day.value == DateTime.now().weekday - 1) {
+  //     Time now = Time(DateTime.now().hour, DateTime.now().minute);
+  //     if (start.compareTo(now) <= 0 && end.compareTo(now) >= 0) {
+  //       return Mode.active;
+  //     } else if (end.compareTo(now) <= 0) {
+  //       return Mode.done;
+  //     } else {
+  //       return Mode.normal;
+  //     }
+  //   } else {
+  //     return Mode.normal;
+  //   }
+  // }
+  Mode mode = Mode.normal;
   Event({
     this.title = "",
     this.abbreviation = "",
@@ -35,6 +36,7 @@ class Event implements Comparable<Event> {
     this.room = "",
     this.day = Weekday.monday,
     this.weekFrom = "",
+    this.collision,
   });
 
   Event.fromDB(Map<String, dynamic> data)
@@ -73,5 +75,11 @@ class Event implements Comparable<Event> {
   @override
   int compareTo(Event other) {
     return start.compareTo(other.start);
+  }
+
+  bool isCollidingWith(Event other) {
+    return start.compareTo(other.start) <= 0 &&
+            end.compareTo(other.start) > 0 ||
+        start.compareTo(other.end) < 0 && end.compareTo(other.end) >= 0;
   }
 }
