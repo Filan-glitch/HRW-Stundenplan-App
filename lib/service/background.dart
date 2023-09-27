@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
@@ -12,46 +11,47 @@ import 'db/events.dart';
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    if (!Platform.isAndroid) return Future.value(false);
+    try {
+      if (!Platform.isAndroid) return Future.value(false);
 
-    dev.log("Background");
-    // Initialisiere das FlutterLocalNotificationsPlugin
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
+      // Initialisiere das FlutterLocalNotificationsPlugin
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
 
-    var initializationSettings = const InitializationSettings(
-      android: AndroidInitializationSettings('app_icon'),
-      iOS: DarwinInitializationSettings(),
-    );
-
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-    // Zeige die Benachrichtigung an
-
-    var platformChannelSpecifics = const NotificationDetails(
-      android: AndroidNotificationDetails(
-        'TIMETABLE_REMINDER',
-        'Terminerinnerung',
-        importance: Importance.max,
-        priority: Priority.high,
-        showWhen: false,
-      ),
-      iOS: DarwinNotificationDetails(),
-    );
-
-    List<Event> events = await getNextEvents();
-    dev.log("Events: ${events.length}");
-
-    for (Event event in events) {
-      await flutterLocalNotificationsPlugin.show(
-        Random().nextInt(100),
-        'Kommende Veranstaltung',
-        event.toString(),
-        platformChannelSpecifics,
+      var initializationSettings = const InitializationSettings(
+        android: AndroidInitializationSettings('notification_icon'),
+        iOS: DarwinInitializationSettings(),
       );
-    }
 
-    return Future.value(true);
+      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+      // Zeige die Benachrichtigung an
+      var platformChannelSpecifics = const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'TIMETABLE_REMINDER',
+          'Terminerinnerung',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: false,
+        ),
+        iOS: DarwinNotificationDetails(),
+      );
+
+      List<Event> events = await getNextEvents();
+
+      for (Event event in events) {
+        await flutterLocalNotificationsPlugin.show(
+          Random().nextInt(100),
+          'Kommende Veranstaltung',
+          event.toString(),
+          platformChannelSpecifics,
+        );
+      }
+
+      return Future.value(true);
+    } catch (e) {
+      return Future.value(false);
+    }
   });
 }
 

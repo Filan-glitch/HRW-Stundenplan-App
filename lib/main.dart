@@ -10,18 +10,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:timetable/service/background.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'api/firebase_api.dart';
 import 'dialogs/crashlytics_dialog.dart';
 import 'firebase_options.dart';
-import 'home_page.dart';
-import 'loading_page.dart';
 import 'model/biometrics.dart';
 import 'model/redux/actions.dart' as redux;
 import 'model/redux/app_state.dart';
 import 'model/redux/store.dart';
+import 'pages/home_page.dart';
+import 'pages/loading_page.dart';
+import 'service/background.dart';
 import 'service/db/events.dart';
 import 'service/db/grades.dart';
 import 'service/storage.dart';
@@ -57,7 +56,6 @@ void main() {
         return true;
       };
     }
-    await FirebaseApi().initNotifications();
 
     await loadBiometrics();
     if (store.state.biometrics == Biometrics.ON) {
@@ -84,6 +82,9 @@ void main() {
       loadCampus(),
       loadNotificationsEnabled(),
       loadDefaultView(),
+      loadAccount(),
+      loadLastUpdated(),
+      loadEnableConfirmRefreshDialog(),
     ]).then((value) {
       store.dispatch(redux.Action(redux.ActionTypes.setupCompleted));
 
@@ -122,15 +123,17 @@ class MyApp extends StatelessWidget {
         builder: ((context, state) {
           SystemChrome.setSystemUIOverlayStyle(
             SystemUiOverlayStyle(
-              statusBarColor: state.darkmode
+              statusBarColor: state.effectiveTheme == ThemeMode.dark
                   ? darkTheme.colorScheme.primary
                   : lightTheme.colorScheme.primary,
               statusBarBrightness: Brightness.light,
-              systemNavigationBarColor: state.darkmode
+              systemNavigationBarColor: state.effectiveTheme == ThemeMode.dark
                   ? darkTheme.colorScheme.background
                   : lightTheme.colorScheme.background,
               systemNavigationBarIconBrightness:
-                  state.darkmode ? Brightness.light : Brightness.dark,
+                  state.effectiveTheme == ThemeMode.dark
+                      ? Brightness.light
+                      : Brightness.dark,
             ),
           );
 
@@ -140,9 +143,16 @@ class MyApp extends StatelessWidget {
           ]);
 
           if (state.appLocked && state.biometrics == Biometrics.ON) {
+            Future.wait([LocalAuthentication().stopAuthentication()]);
             LocalAuthentication()
                 .authenticate(
               localizedReason: 'Bitte App entsperren',
+              options: const AuthenticationOptions(
+                stickyAuth: true,
+                sensitiveTransaction: false,
+                biometricOnly: true,
+                useErrorDialogs: false,
+              ),
             )
                 .then((success) {
               if (success) {
@@ -158,8 +168,8 @@ class MyApp extends StatelessWidget {
             title: 'Stundenplan',
             theme: lightTheme,
             darkTheme: darkTheme,
+            themeMode: state.activeTheme,
             debugShowCheckedModeBanner: false,
-            themeMode: state.darkmode ? ThemeMode.dark : ThemeMode.light,
             supportedLocales: const [Locale("de", "DE")],
             navigatorKey: navigatorKey,
             localizationsDelegates: const [

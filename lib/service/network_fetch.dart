@@ -20,6 +20,23 @@ import '../model/redux/store.dart';
 import '../model/time.dart';
 import '../model/weekday.dart';
 import 'db/events.dart';
+import 'db/grades.dart';
+import 'storage.dart';
+
+Future<void> reloadAll() async {
+  DateFormat formatter = DateFormat('dd/MM/yyyy');
+  List<Future> futures = store.state.events.keys
+      .map((week) => fetchTimetableData(formatter.parse(week)))
+      .toList();
+  futures.add(fetchGradeData());
+  futures.add(fetchAccountData());
+  await Future.wait(futures);
+
+  await writeDataToStorage();
+  await writeGradesToStorage();
+  await writeGPA();
+  await writeAccount();
+}
 
 Future<void> loadWeekInterval({DateTime? start, int weeks = 6}) {
   start ??= DateTime.now();
@@ -121,6 +138,38 @@ Future<void> fetchGradeData() async {
   }
 }
 
+Future<void> fetchAccountData() async {
+  try {
+    if (store.state.args == null || store.state.cnsc == null) return;
+
+    store.dispatch(Action(ActionTypes.startTask));
+    dom.Document body = await _fetchAccountHTML();
+    String account = await _parseAccount(body);
+
+    store.dispatch(Action(
+      ActionTypes.setAccount,
+      payload: account,
+    ));
+
+    store.dispatch(Action(ActionTypes.stopTask));
+  } on TimeoutException {
+    showToast('Keine Verbindung');
+    store.dispatch(Action(ActionTypes.stopTask));
+  } on SocketException {
+    showToast('Keine Verbindung');
+    store.dispatch(Action(ActionTypes.stopTask));
+  } catch (e, stackTrace) {
+    showToast('Es ist ein Fehler aufgetreten');
+    if (kDebugMode) {
+      print(e);
+      print(stackTrace);
+    }
+    store.dispatch(Action(ActionTypes.stopTask));
+
+    FirebaseCrashlytics.instance.recordError(e, stackTrace);
+  }
+}
+
 Future<dom.Document> _fetchScheduleHTML(
   DateTime monday,
 ) async {
@@ -136,17 +185,30 @@ Future<dom.Document> _fetchScheduleHTML(
 }
 
 Future<dom.Document> _fetchGradesHTML() async {
-  String args = store.state.args!;
-  args = args.split(",")[0];
+  String? args = store.state.args;
+  String? cnsc = store.state.cnsc;
+  args = args?.split(",")[0];
   http.Response registrations = await http.get(
       Uri.parse(
         "$BASE_URL?APPNAME=CampusNet&PRGNAME=STUDENT_RESULT&ARGUMENTS=$args,-N000407,-N0,-N000000000000000,-N000000000000000,-N000000000000000,-N0,-N000000000000000",
       ),
-      headers: {"Cookie": "cnsc=${store.state.cnsc}"});
+      headers: {"Cookie": "cnsc=$cnsc"});
 
-  var temp = (utf8.decode(registrations.bodyBytes));
-  temp = temp.replaceAll("\t", "");
-  temp = temp.replaceAll("\n", "");
+  var temp = _cleanString(utf8.decode(registrations.bodyBytes));
+  return html.parse(temp);
+}
+
+Future<dom.Document> _fetchAccountHTML() async {
+  String? args = store.state.args;
+  String? cnsc = store.state.cnsc;
+  args = args?.split(",")[0];
+  http.Response registrations = await http.get(
+      Uri.parse(
+        "$BASE_URL?APPNAME=CampusNet&PRGNAME=PERSADDRESS&ARGUMENTS=$args,-N000426,",
+      ),
+      headers: {"Cookie": "cnsc=$cnsc"});
+
+  var temp = _cleanString(utf8.decode(registrations.bodyBytes));
   return html.parse(temp);
 }
 
@@ -202,12 +264,12 @@ Future<List<Event>> _parseTimetable(
     if (title == null) continue;
 
     Time start = Time(
-      int.parse(timePeriod[0].group(1) ?? "0"),
-      int.parse(timePeriod[0].group(2) ?? "0"),
+      int.tryParse(timePeriod.first.group(1) ?? "0") ?? 0,
+      int.tryParse(timePeriod.first.group(2) ?? "0") ?? 0,
     );
     Time end = Time(
-      int.parse(timePeriod[0].group(3) ?? "0"),
-      int.parse(timePeriod[0].group(4) ?? "0"),
+      int.tryParse(timePeriod.first.group(3) ?? "0") ?? 0,
+      int.tryParse(timePeriod.first.group(4) ?? "0") ?? 0,
     );
 
     events.add(
@@ -241,17 +303,14 @@ Future<List<Module>> _parseGrades(dom.Document document) async {
     if (data.isEmpty) continue;
 
     Module module = Module(
-      identifier: data[0].text,
+      identifier: data.first.text,
       title: data[1].querySelector("a")?.text ??
           data[1].text.replaceAll("\n", "").trim(),
-      creditsAll: int.parse(
-        data[3].text == "" ? "0" : data[3].text.split(",")[0],
-      ),
-      creditsCharged: int.parse(
-        data[4].text == "" ? "0" : data[4].text.split(",")[0],
-      ),
+      creditsAll: int.tryParse(data[3].text.split(",").firstOrNull ?? "0") ?? 0,
+      creditsCharged:
+          int.tryParse(data[4].text.split(",").firstOrNull ?? "0") ?? 0,
       grade: double.tryParse(
-            data[5].text == "" ? "0" : data[5].text.replaceAll(",", "."),
+            data[5].text.replaceAll(",", "."),
           ) ??
           0.0,
     );
@@ -277,8 +336,27 @@ Future<double> _parseGPA(dom.Document document) async {
   try {
     var data = document.querySelectorAll(
         'table.nb.list.students_results th.tbsubhead[style="text-align:right;"]');
-    return double.parse(data[1].text.trimLeft().replaceAll(",", "."));
+    if (data.length > 1) {
+      return double.tryParse(data[1].text.trim().replaceAll(",", ".")) ?? 0.0;
+    }
   } on FormatException {
     return 0.0;
   }
+  return 0.0;
+}
+
+Future<String> _parseAccount(dom.Document document) async {
+  var firstName =
+      _cleanString(document.querySelector('td[name="firstName"]')!.text).trim();
+  var lastName =
+      _cleanString(document.querySelector('td[name="middleName"]')!.text)
+          .trim();
+  var matriculationNumber = _cleanString(
+          document.querySelector('td[name="matriculationNumber"]')!.text)
+      .trim();
+  return "$firstName $lastName ($matriculationNumber)";
+}
+
+String _cleanString(String input) {
+  return input.replaceAll("\t", "").replaceAll("\n", "");
 }

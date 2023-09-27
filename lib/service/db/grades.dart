@@ -40,6 +40,8 @@ Future<void> writeGradesToStorage() async {
   try {
     Database db = await openDB();
 
+    await db.delete('Grades', where: null);
+
     for (Module module in store.state.modules) {
       await db.insert(
         'Grades',

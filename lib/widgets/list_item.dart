@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import '../dialogs/collision_dialog.dart';
 import '../model/date_time_calculator.dart';
 import '../model/event.dart';
 import '../model/mode.dart';
@@ -76,50 +78,75 @@ class _ListItemState extends State<ListItem> {
             );
           }
 
-          return Opacity(
-            opacity: widget.event.mode == Mode.done && isCurrentWeek ? 0.6 : 1,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  left: widget.event.mode == Mode.active && isCurrentWeek
-                      ? BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 5,
-                        )
-                      : BorderSide.none,
+          return GestureDetector(
+            onTap: () {
+              if (widget.event.collision != null && widget.event.collision!) {
+                showDialog(
+                  context: context,
+                  builder: (context) => const CollisionDialog(),
+                );
+              }
+            },
+            child: Opacity(
+              opacity:
+                  widget.event.mode == Mode.done && isCurrentWeek ? 0.6 : 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.lerp(
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.background,
+                    widget.event.mode == Mode.active && isCurrentWeek
+                        ? 0.9
+                        : 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-              ),
-              child: Padding(
                 padding: EdgeInsets.symmetric(
-                  vertical: 8.0,
+                  vertical: 10.0,
                   horizontal: widget.event.mode == Mode.active && isCurrentWeek
-                      ? 10.0
-                      : 0.0,
+                      ? 15.0
+                      : 10.0,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                margin: EdgeInsets.symmetric(
+                    vertical: 5.0,
+                    horizontal:
+                        widget.event.mode == Mode.active && isCurrentWeek
+                            ? 5.0
+                            : 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.event.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width *
+                          ((widget.event.collision == true) ? 0.7 : 0.80),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.event.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${widget.event.start} - ${widget.event.end}',
+                          ),
+                          Text(
+                            widget.event.room,
+                          ),
+                          if (timeIndicatorWidget != null) timeIndicatorWidget,
+                        ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('${widget.event.start} - ${widget.event.end}'),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: Text(widget.event.room),
-                            ),
-                            timeIndicatorWidget ?? Container(),
-                          ],
+                    if (widget.event.collision == true)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 3.0),
+                        child: Icon(
+                          CupertinoIcons.exclamationmark_triangle_fill,
+                          color: Colors.red,
+                          size: 30.0,
                         ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),

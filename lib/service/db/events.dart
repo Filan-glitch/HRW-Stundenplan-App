@@ -87,6 +87,8 @@ Future<void> writeDataToStorage() async {
     DateTime? lastFetchedWeek;
     Database db = await openDB();
 
+    await db.delete('Events', where: null);
+
     for (String date in store.state.events.keys) {
       if (lastFetchedWeek == null ||
           formatter.parse(date).isAfter(lastFetchedWeek)) {
@@ -106,6 +108,14 @@ Future<void> writeDataToStorage() async {
       await writeDownloadedRange(formatter.format(lastFetchedWeek));
     }
 
+    store.dispatch(
+      Action(
+        ActionTypes.setLastUpdated,
+        payload: DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
+      ),
+    );
+    writeLastUpdated();
+
     await db.close();
   } catch (e, stackTrace) {
     showToast('Es ist ein Fehler aufgetreten');
@@ -123,25 +133,29 @@ Future<List<Event>> getNextEvents() async {
     db = await openDB();
     List<Map<String, dynamic>> result = await db.query('Events');
 
+    if (DateTime.now().weekday >= 6) {
+      return [];
+    }
+
     DateFormat formatter = DateFormat('dd/MM/yyyy');
-    int rangeStart = DateTime.now().hour * 60 + DateTime.now().minute;
-    int rangeEnd = DateTime.now().hour * 60 + DateTime.now().minute + 20;
-    DateTime monday =
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-            .subtract(
-      Duration(
-        days: DateTime.now().weekday - 1,
-      ),
-    );
+
+    DateTime now = DateTime.now();
+    int rangeStart = now.hour * 60 + now.minute + 7;
+    int rangeEnd = now.hour * 60 + now.minute + 23;
+    DateTime monday = DateTimeCalculator.getFirstDayOfWeek(DateTime.now());
 
     return result
         .map(Event.fromDB)
-        .where((element) =>
-            formatter.parse(element.weekFrom).isAtSameMomentAs(monday))
+        .where((element) {
+          DateTime weekFrom = DateTimeCalculator.clean(
+            formatter.parse(element.weekFrom),
+          );
+          return weekFrom.isAtSameMomentAs(monday);
+        })
         .where((element) =>
             element.day == Weekday.getByValue(DateTime.now().weekday - 1))
-        .where((element) => element.start.totalMinutes > rangeStart)
-        .where((element) => element.start.totalMinutes < rangeEnd)
+        .where((element) => element.start.totalMinutes >= rangeStart)
+        .where((element) => element.start.totalMinutes <= rangeEnd)
         .toList();
   } finally {
     await db.close();

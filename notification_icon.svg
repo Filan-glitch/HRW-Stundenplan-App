@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="500"
+   height="500"
+   viewBox="0 0 132.29166 132.29167"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   sodipodi:docname="notification_icon.svg"
+   inkscape:export-filename="C:\Users\janbellenberg\Desktop\timetable\android\app\src\main\res\mipmap-mdpi\notification_icon.png"
+   inkscape:export-xdpi="9.2159996"
+   inkscape:export-ydpi="9.2159996"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:document-units="px"
+     showgrid="false"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-global="false"
+     inkscape:zoom="0.84852814"
+     inkscape:cx="246.89812"
+     inkscape:cy="147.90317"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path846-2"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.51269;stroke-miterlimit:10;paint-order:stroke fill markers"
+       d="M 66.145832,0.75658875 A 65.389247,65.389247 0 0 0 0.75658875,66.145832 65.389247,65.389247 0 0 0 66.145832,131.53508 65.389247,65.389247 0 0 0 131.53508,66.145832 65.389247,65.389247 0 0 0 66.145832,0.75658875 Z M 66.01748,19.63837 c 3.000742,0 5.416325,2.294715 5.416325,5.144934 V 66.024506 L 95.180828,94.86793 c 1.576181,1.91445 0.88347,5.070635 -1.552995,7.0766 -2.436465,2.00596 -5.667083,2.07984 -7.243265,0.16539 L 62.755681,73.409531 C 61.445598,72.472193 60.601158,70.981972 60.601158,69.297159 V 24.783304 c 0,-2.850219 2.41558,-5.144934 5.416322,-5.144934 z" />
+  </g>
+</svg>

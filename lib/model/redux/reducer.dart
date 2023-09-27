@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart' as ui;
+
 import '../biometrics.dart';
 import '../campus.dart';
 import '../date_time_calculator.dart';
@@ -11,7 +13,7 @@ AppState appReducer(AppState state, dynamic action) {
   if (action.type == ActionTypes.setEvents) {
     state.events[action.payload["date"]] = action.payload["events"];
   } else if (action.type == ActionTypes.clear) {
-    state.darkmode = false;
+    state.activeTheme = ui.ThemeMode.system;
     state.runningTasks = 0;
     state.cnsc = null;
     state.args = null;
@@ -23,8 +25,9 @@ AppState appReducer(AppState state, dynamic action) {
     state.currentView = TimetableView.daily;
     state.defaultView = TimetableView.daily;
     state.appLocked = false;
-  } else if (action.type == ActionTypes.setDarkmode) {
-    state.darkmode = action.payload;
+    state.account = null;
+  } else if (action.type == ActionTypes.setDesign) {
+    state.activeTheme = action.payload;
   } else if (action.type == ActionTypes.setCredentials) {
     state.args = action.payload["args"];
     state.cnsc = action.payload["cnsc"];
@@ -56,6 +59,12 @@ AppState appReducer(AppState state, dynamic action) {
     state.currentView = action.payload;
   } else if (action.type == ActionTypes.setDefaultView) {
     state.defaultView = action.payload;
+  } else if (action.type == ActionTypes.setAccount) {
+    state.account = action.payload;
+  } else if (action.type == ActionTypes.setLastUpdated) {
+    state.lastUpdated = action.payload;
+  } else if (action.type == ActionTypes.setEnableConfirmRefreshDialog) {
+    state.enableConfirmRefreshDialog = action.payload;
   }
   return state;
 }

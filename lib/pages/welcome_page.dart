@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:timetable/service/storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yaml/yaml.dart';
 
+import '../model/constants.dart';
+import '../service/db/grades.dart';
+import '../service/network_fetch.dart';
+import '../service/storage.dart';
 import 'login_page.dart';
-import 'model/constants.dart';
-import 'service/db/grades.dart';
-import 'service/network_fetch.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({
@@ -51,6 +51,9 @@ class WelcomePage extends StatelessWidget {
                   writeGradesToStorage();
                   writeGPA();
                 });
+                await fetchAccountData().then((_) {
+                  writeAccount();
+                });
               });
             },
             child: const Row(
@@ -77,14 +80,14 @@ class WelcomePage extends StatelessWidget {
                     mode: LaunchMode.externalApplication,
                   );
                 },
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.admin_panel_settings,
-                      color: Colors.black54,
+                      color: Theme.of(context).dividerColor.withOpacity(0.7),
                     ),
-                    Text("  Datenschutz"),
+                    const Text("  Datenschutz"),
                   ],
                 ),
               )
@@ -97,10 +100,10 @@ class WelcomePage extends StatelessWidget {
                 return Text(
                   'Version: ${loadYaml(
                     snapshot.data.toString(),
-                  )["version"].split("+")[0]}',
-                  style: const TextStyle(
+                  )["version"].split("+").first}',
+                  style: TextStyle(
                     fontSize: 15.0,
-                    color: Colors.black54,
+                    color: Theme.of(context).dividerColor.withOpacity(0.7),
                   ),
                   textAlign: TextAlign.center,
                 );

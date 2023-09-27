@@ -1,21 +1,38 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:oktoast/oktoast.dart';
-import 'package:timetable/model/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:oktoast/oktoast.dart';
 
-import 'model/login_state.dart';
-import 'model/redux/store.dart';
-import 'model/redux/actions.dart' as redux;
-import 'service/storage.dart';
+import '../model/constants.dart';
+import '../model/login_state.dart';
+import '../model/redux/actions.dart' as redux;
+import '../model/redux/store.dart';
+import '../service/storage.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   static Completer<bool>? _loginCompleter;
   static Future<void> Function()? _onLoginSuccess;
+
+  static Future<bool> hasActiveSession() async {
+    store.dispatch(redux.Action(
+      redux.ActionTypes.startTask,
+    ));
+
+    String identityPageContent = (await http
+            .get(Uri.parse("https://dsf.hs-ruhrwest.de/IdentityServer/")))
+        .body;
+
+    store.dispatch(redux.Action(
+      redux.ActionTypes.stopTask,
+    ));
+
+    return identityPageContent.contains("Logout");
+  }
 
   static Future<bool> performLogin(
       {required Future<void> Function() onLoginSuccess}) async {
@@ -36,6 +53,17 @@ class LoginPage extends StatelessWidget {
     return _loginCompleter!.future;
   }
 
+  void _cancelLogin() {
+    store.dispatch(redux.Action(
+      redux.ActionTypes.setLoginFormState,
+      payload: LoginFormState.notShown,
+    ));
+
+    if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
+      _loginCompleter!.complete(false);
+    }
+  }
+
   final GlobalKey _webViewKey = GlobalKey();
 
   @override
@@ -46,13 +74,7 @@ class LoginPage extends StatelessWidget {
       ),
       body: WillPopScope(
         onWillPop: () async {
-          store.dispatch(redux.Action(
-            redux.ActionTypes.setLoginFormState,
-            payload: LoginFormState.notShown,
-          ));
-
-          _loginCompleter!.complete(false);
-
+          _cancelLogin();
           return false;
         },
         child: InAppWebView(
@@ -60,10 +82,26 @@ class LoginPage extends StatelessWidget {
           initialUrlRequest: URLRequest(url: Uri.parse(LOGIN_URL)),
           shouldOverrideUrlLoading: _onNavigationRequest,
           initialOptions: InAppWebViewGroupOptions(
-            crossPlatform: InAppWebViewOptions(
-              useShouldOverrideUrlLoading: true,
-            ),
-          ),
+              crossPlatform: InAppWebViewOptions(
+                useShouldOverrideUrlLoading: true,
+              ),
+              android: AndroidInAppWebViewOptions(
+                useHybridComposition: true,
+              )),
+          onWebViewCreated: (controller) {
+            controller.addJavaScriptHandler(
+              handlerName: 'cancel',
+              callback: (args) {
+                _cancelLogin();
+              },
+            );
+          },
+          onLoadStop: (controller, url) {
+            if (!url.toString().contains("IdentityServer/Account/Login")) {
+              return;
+            }
+            _injectCancelJS(controller);
+          },
         ),
       ),
     );
@@ -131,5 +169,12 @@ class LoginPage extends StatelessWidget {
         showToast("Es ist ein Fehler aufgetreten");
       }
     });
+  }
+
+  void _injectCancelJS(InAppWebViewController controller) {
+    controller.evaluateJavascript(
+      source:
+          """document.querySelector('button[value=cancel]').onclick = () => window.flutter_inappwebview.callHandler('cancel');""",
+    );
   }
 }

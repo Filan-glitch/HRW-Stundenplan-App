@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+
 import '../model/biometrics.dart';
 import '../model/redux/actions.dart' as redux;
 import '../model/redux/store.dart';
@@ -46,8 +47,15 @@ class SelectLockDialog extends StatelessWidget {
       payload: false,
     ));
 
+    await LocalAuthentication().stopAuthentication();
     bool success = await LocalAuthentication().authenticate(
-      localizedReason: "Bitte authentifizieren Sie sich",
+      localizedReason: 'Bitte App entsperren',
+      options: const AuthenticationOptions(
+        stickyAuth: true,
+        sensitiveTransaction: false,
+        biometricOnly: true,
+        useErrorDialogs: false,
+      ),
     );
 
     if (!success) return;
