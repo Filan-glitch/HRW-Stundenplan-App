@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Style definitions for dark theme.
-ThemeData darkTheme = ThemeData(
+ThemeData darkTheme = ThemeData.dark(
   useMaterial3: true,
+).copyWith(
   cardColor: const Color(0xff2a313d),
   dividerColor: Colors.white,
   colorScheme: const ColorScheme.dark(

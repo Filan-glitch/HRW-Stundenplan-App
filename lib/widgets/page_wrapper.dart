@@ -85,12 +85,20 @@ class _PageWrapperState extends State<PageWrapper> with WidgetsBindingObserver {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: widget.body,
+        body: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewPadding.bottom,
+          ),
+          child: widget.body,
+        ),
       );
     } else {
       mainContent = Scaffold(
         bottomNavigationBar: widget.bottomNavigationBar,
         body: Container(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).viewPadding.top - 5.0,
+          ),
           color: Theme.of(context).colorScheme.primary,
           child: StoreConnector<AppState, AppState>(
               converter: (store) => store.state,
@@ -153,6 +161,9 @@ class _PageWrapperState extends State<PageWrapper> with WidgetsBindingObserver {
                     Expanded(
                       child: Container(
                         width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewPadding.bottom,
+                        ),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.background,
                           borderRadius: const BorderRadius.only(
@@ -175,12 +186,10 @@ class _PageWrapperState extends State<PageWrapper> with WidgetsBindingObserver {
       builder: (context, state) {
         return Stack(
           children: [
-            SafeArea(
-              child: OKToast(
-                child: state.args == null || state.cnsc == null
-                    ? const WelcomePage()
-                    : mainContent,
-              ),
+            OKToast(
+              child: state.args == null || state.cnsc == null
+                  ? const WelcomePage()
+                  : mainContent,
             ),
             if (state.appLocked && state.biometrics != Biometrics.OFF)
               const BiometricsPage(),

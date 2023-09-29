@@ -11,8 +11,8 @@ import '../model/redux/actions.dart' as redux;
 import '../model/redux/store.dart';
 import '../service/storage.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   static Completer<bool>? _loginCompleter;
   static Future<void> Function()? _onLoginSuccess;
@@ -52,14 +52,20 @@ class LoginPage extends StatelessWidget {
     return _loginCompleter!.future;
   }
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   void _cancelLogin() {
     store.dispatch(redux.Action(
       redux.ActionTypes.setLoginFormState,
       payload: LoginFormState.notShown,
     ));
 
-    if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
-      _loginCompleter!.complete(false);
+    if (LoginPage._loginCompleter != null &&
+        !LoginPage._loginCompleter!.isCompleted) {
+      LoginPage._loginCompleter!.complete(false);
     }
   }
 
@@ -81,12 +87,13 @@ class LoginPage extends StatelessWidget {
           initialUrlRequest: URLRequest(url: Uri.parse(LOGIN_URL)),
           shouldOverrideUrlLoading: _onNavigationRequest,
           initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                useShouldOverrideUrlLoading: true,
-              ),
-              android: AndroidInAppWebViewOptions(
-                useHybridComposition: true,
-              )),
+            crossPlatform: InAppWebViewOptions(
+              useShouldOverrideUrlLoading: true,
+            ),
+            android: AndroidInAppWebViewOptions(
+              useHybridComposition: true,
+            ),
+          ),
           onWebViewCreated: (controller) {
             controller.addJavaScriptHandler(
               handlerName: 'cancel',
@@ -130,7 +137,7 @@ class LoginPage extends StatelessWidget {
     String? args, cnsc;
     Uri link = Uri.parse(url);
     http.get(link).then((response) async {
-      if (_loginCompleter!.isCompleted) return;
+      if (LoginPage._loginCompleter!.isCompleted) return;
 
       // extract ARGUMENTS
       String startpageLink = response.headers["refresh"] ?? "";
@@ -158,13 +165,17 @@ class LoginPage extends StatelessWidget {
           payload: {"cnsc": cnsc, "args": args},
         ));
 
-        await _onLoginSuccess!();
+        await LoginPage._onLoginSuccess!();
 
         writeCredentials().then((value) {
-          if (!_loginCompleter!.isCompleted) _loginCompleter!.complete(true);
+          if (!LoginPage._loginCompleter!.isCompleted) {
+            LoginPage._loginCompleter!.complete(true);
+          }
         });
       } else {
-        if (!_loginCompleter!.isCompleted) _loginCompleter!.complete(false);
+        if (!LoginPage._loginCompleter!.isCompleted) {
+          LoginPage._loginCompleter!.complete(false);
+        }
         showToast("Es ist ein Fehler aufgetreten");
       }
     });

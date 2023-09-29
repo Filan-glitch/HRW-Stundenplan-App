@@ -1,6 +1,5 @@
 import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../dialogs/changelog_dialog.dart';
@@ -14,8 +13,6 @@ import '../model/redux/store.dart';
 import '../model/timetable_view.dart';
 import '../model/weekday.dart';
 import '../service/network_fetch.dart';
-import '../themes/dark.dart';
-import '../themes/light.dart';
 import '../widgets/month_overview.dart';
 import '../widgets/page_wrapper.dart';
 import '../widgets/timetable.dart';
@@ -70,21 +67,6 @@ class _HomePageState extends State<HomePage> {
     return StoreConnector<AppState, AppState>(
         converter: (store) => store.state,
         builder: (context, state) {
-          SystemChrome.setSystemUIOverlayStyle(
-            SystemUiOverlayStyle(
-              statusBarColor: state.effectiveTheme == ThemeMode.dark
-                  ? darkTheme.colorScheme.primary
-                  : lightTheme.colorScheme.primary,
-              statusBarBrightness: Brightness.light,
-              systemNavigationBarColor: state.effectiveTheme == ThemeMode.dark
-                  ? darkTheme.colorScheme.background
-                  : lightTheme.colorScheme.background,
-              systemNavigationBarIconBrightness:
-                  state.effectiveTheme == ThemeMode.dark
-                      ? Brightness.light
-                      : Brightness.dark,
-            ),
-          );
           Widget content = Container();
 
           if (state.currentView == TimetableView.daily) {
