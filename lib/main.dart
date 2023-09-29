@@ -45,7 +45,6 @@ void main() {
         }
         FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
       };
-      // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
       PlatformDispatcher.instance.onError = (error, stack) {
         try {
           showToast("Unbekannter Fehler");
@@ -56,6 +55,8 @@ void main() {
         return true;
       };
     }
+
+    await clearStorageIfUpdated();
 
     await loadBiometrics();
     if (store.state.biometrics == Biometrics.ON) {
@@ -169,7 +170,6 @@ class MyApp extends StatelessWidget {
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: state.activeTheme,
-            debugShowCheckedModeBanner: false,
             supportedLocales: const [Locale("de", "DE")],
             navigatorKey: navigatorKey,
             localizationsDelegates: const [

@@ -333,11 +333,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.error),
-                      title: const Text("Disclaimer"),
+                      title: const Text("Nutzungsbedingungen"),
                       onTap: () {
                         launchUrl(
                           Uri.parse(
-                            DISCLAIMER_URL,
+                            TERMS_URL,
                           ),
                           mode: LaunchMode.externalApplication,
                         );

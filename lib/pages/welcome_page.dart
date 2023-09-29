@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,10 +10,15 @@ import '../service/network_fetch.dart';
 import '../service/storage.dart';
 import 'login_page.dart';
 
-class WelcomePage extends StatelessWidget {
-  const WelcomePage({
-    super.key,
-  });
+class WelcomePage extends StatefulWidget {
+  const WelcomePage({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  bool _isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +47,26 @@ class WelcomePage extends StatelessWidget {
                 ),
               ),
               Text("Stundenplan App", style: TextStyle(fontSize: 22.0)),
+              Text("des Institut Informatik", style: TextStyle(fontSize: 17.0)),
             ],
           ),
           ElevatedButton(
-            onPressed: () async {
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.disabled)) return Colors.grey;
+                  return null;
+                },
+              ),
+              enableFeedback: (_isChecked) ? true : false,
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+            ),
+            onPressed: (_isChecked)
+                ? () async {
               LoginPage.performLogin(onLoginSuccess: () async {
                 await loadWeekInterval();
                 await fetchGradeData().then((_) {
@@ -55,7 +77,8 @@ class WelcomePage extends StatelessWidget {
                   writeAccount();
                 });
               });
-            },
+            }
+                : null,
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -65,6 +88,60 @@ class WelcomePage extends StatelessWidget {
                     10.0,
                   ),
                   child: Text("CampusNet Login"),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Row(
+              children: [
+                Checkbox(
+                    value: _isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isChecked = value!;
+                      });
+                    }),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.7),
+                            ),
+                            text: "Ich akzeptiere die "),
+                        TextSpan(
+                          style: TextStyle(
+                            color: Theme.of(context).dividerColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                          text: "Nutzungsbedingungen",
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              launchUrl(
+                                Uri.parse(
+                                  TERMS_URL,
+                                ),
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                        ),
+                        TextSpan(
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .dividerColor
+                                .withOpacity(0.7),
+                          ),
+                          text: " akzeptiert.",
+                        ),
+                      ]
+                    ),
+                  ),
                 ),
               ],
             ),

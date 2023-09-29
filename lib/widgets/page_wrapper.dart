@@ -14,7 +14,7 @@ import '../pages/welcome_page.dart';
 import 'action_menu.dart';
 
 class PageWrapper extends StatefulWidget {
-  PageWrapper({
+  const PageWrapper({
     required this.body,
     this.bottomNavigationBar,
     this.actions = const [],

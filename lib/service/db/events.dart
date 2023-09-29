@@ -34,12 +34,12 @@ Future<void> loadDataFromStorage() async {
       }
     }
 
-    DateTime oldEventDate = DateTime.now().subtract(const Duration(days: 7));
     for (Map<String, dynamic> item in result) {
-      DateTime eventDate = formatter.parse(item['WeekFrom']);
+      DateTime eventDate = formatter.parse(item['WeekFrom']).add(Duration(days: int.parse(item['Weekday'])));
 
+      DateTime today = DateTime.now();
       // Remove past events
-      if (eventDate.isBefore(oldEventDate)) {
+      if (eventDate.year < today.year || eventDate.year == today.year && eventDate.month < today.month) {
         await db.delete(
           'Events',
           where: 'EventID = ?',

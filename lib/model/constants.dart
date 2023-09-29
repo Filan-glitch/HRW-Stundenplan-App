@@ -7,8 +7,8 @@ const String SOURCE_URL =
 const String FEEDBACK_URL =
     "https://docs.google.com/forms/d/e/1FAIpQLSd6d3cobkONv1Rq94OpSGmQNv0WWu51b3ZOyV5Yv02q4BPNwQ/viewform";
 const String PRIVACY_URL = "https://timetable.janbellenberg.de/privacy";
-const String DISCLAIMER_URL = "https://timetable.janbellenberg.de/disclaimer";
 const String CAMPUS_URL = "https://campusnet.hs-ruhrwest.de";
+const String TERMS_URL = "https://timetable.janbellenberg.de/terms";
 
 const String MENSA_BOT_CURRENT_URL =
     "https://www.stw-edu.de/mensadaten/pdf/mensa-hrw-bottrop/aktuelle_woche.pdf";
