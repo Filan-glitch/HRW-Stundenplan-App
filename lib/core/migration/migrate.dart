@@ -9,8 +9,7 @@ final List<Future<void> Function()?> _migrations = [
   null, // version code 2
   null, // version code 3
   null, // version code 4
-  null, // version code 5
-  v152.migrate, // version code 6
+  v152.migrate, // version code 5
 ];
 
 Future<void> performMigration() async {
