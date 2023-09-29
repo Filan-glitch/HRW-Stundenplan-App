@@ -124,18 +124,20 @@ class MyApp extends StatelessWidget {
         builder: ((context, state) {
           SystemChrome.setSystemUIOverlayStyle(
             SystemUiOverlayStyle(
-              statusBarColor: state.effectiveTheme == ThemeMode.dark
-                  ? darkTheme.colorScheme.primary
-                  : lightTheme.colorScheme.primary,
-              statusBarBrightness: Brightness.light,
-              systemNavigationBarColor: state.effectiveTheme == ThemeMode.dark
-                  ? darkTheme.colorScheme.background
-                  : lightTheme.colorScheme.background,
+              statusBarBrightness: state.effectiveTheme == ThemeMode.dark
+                  ? Brightness.light
+                  : Brightness.dark,
               systemNavigationBarIconBrightness:
                   state.effectiveTheme == ThemeMode.dark
                       ? Brightness.light
                       : Brightness.dark,
+              systemNavigationBarColor: Colors.transparent,
             ),
+          );
+
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.edgeToEdge,
+            overlays: [SystemUiOverlay.top],
           );
 
           SystemChrome.setPreferredOrientations([
@@ -177,12 +179,9 @@ class MyApp extends StatelessWidget {
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
             ],
-            home: OKToast(
-              position: ToastPosition.bottom,
-              child: state.dataLoaded
-                  ? const HomePage()
-                  : const Scaffold(body: LoadingPage()),
-            ),
+            home: state.dataLoaded
+                ? const HomePage()
+                : const Scaffold(body: LoadingPage()),
           );
         }),
       ),

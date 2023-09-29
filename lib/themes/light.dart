@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Style definitions for light theme.
-ThemeData lightTheme = ThemeData(
+ThemeData lightTheme = ThemeData.light(
   useMaterial3: true,
+).copyWith(
   cardColor: const Color(0xffcacbcc),
   dividerColor: Colors.black,
   colorScheme: const ColorScheme.light(
