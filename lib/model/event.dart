@@ -3,7 +3,7 @@ import 'time.dart';
 import 'weekday.dart';
 
 class Event implements Comparable<Event> {
-  String get eventID => "$abbreviation$weekFrom";
+  String get eventID => "$abbreviation$weekFrom${day.value}${start.toString()}";
   String title;
   String abbreviation;
   Time start;
@@ -13,21 +13,21 @@ class Event implements Comparable<Event> {
   String weekFrom;
   bool? collision;
 
-  // Mode get mode {
-  //   if (day.value == DateTime.now().weekday - 1) {
-  //     Time now = Time(DateTime.now().hour, DateTime.now().minute);
-  //     if (start.compareTo(now) <= 0 && end.compareTo(now) >= 0) {
-  //       return Mode.active;
-  //     } else if (end.compareTo(now) <= 0) {
-  //       return Mode.done;
-  //     } else {
-  //       return Mode.normal;
-  //     }
-  //   } else {
-  //     return Mode.normal;
-  //   }
-  // }
-  Mode mode = Mode.normal;
+  Mode get mode {
+    if (day.value == DateTime.now().weekday - 1) {
+      Time now = Time(DateTime.now().hour, DateTime.now().minute);
+      if (start.compareTo(now) <= 0 && end.compareTo(now) >= 0) {
+        return Mode.active;
+      } else if (end.compareTo(now) <= 0) {
+        return Mode.done;
+      } else {
+        return Mode.normal;
+      }
+    } else {
+      return Mode.normal;
+    }
+  }
+
   Event({
     this.title = "",
     this.abbreviation = "",

@@ -1,3 +1,4 @@
+import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -55,6 +56,13 @@ class _HomePageState extends State<HomePage> {
       redux.ActionTypes.setCurrentWeek,
       payload: currentWeek,
     ));
+
+    AdvancedInAppReview()
+        .setMinDaysBeforeRemind(14)
+        .setMinDaysAfterInstall(2)
+        .setMinLaunchTimes(5)
+        .setMinSecondsBeforeShowDialog(4)
+        .monitor();
   }
 
   @override
@@ -135,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(top: 5.0),
                 child: Text(
                   "Zuletzt aktualisiert: ${state.lastUpdated ?? "Nie"}",
-                  style: TextStyle(fontSize: 12.0),
+                  style: const TextStyle(fontSize: 12.0),
                 ),
               ),
               if (state.currentView != TimetableView.daily)

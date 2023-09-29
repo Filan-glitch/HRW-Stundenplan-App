@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart' as ui;
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:yaml/yaml.dart';
 
 import '../model/biometrics.dart';
 import '../model/campus.dart';
@@ -222,8 +224,23 @@ Future<void> loadLastUpdated() async {
   }
 }
 
+Future<bool> clearStorageIfUpdated() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String pubspec = await rootBundle.loadString("pubspec.yaml");
+  String appVersion = loadYaml(pubspec)["version"].split("+")[0];
+
+  if (prefs.getString("version") != appVersion) {
+    await clearStorage();
+    prefs.setString("version", appVersion);
+    return true;
+  }
+
+  return false;
+}
+
 Future<void> clearStorage() async {
-  (await SharedPreferences.getInstance()).clear();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
   String path = join(await getDatabasesPath(), "timetable.db");
   await deleteDatabase(path);
   CookieManager.instance().deleteAllCookies();

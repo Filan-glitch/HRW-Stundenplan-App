@@ -1,3 +1,7 @@
+# v1.5.2
+- Nutzungsbedingungen aktualisiert
+- Datenbank fix
+
 # v1.5.1
 
 - Erkennung von Terminkollisionen
