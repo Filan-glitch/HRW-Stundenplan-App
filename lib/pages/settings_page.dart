@@ -14,7 +14,6 @@ import 'package:yaml/yaml.dart';
 
 import '../dialogs/changelog_dialog.dart';
 import '../dialogs/crashlytics_dialog.dart';
-import '../dialogs/select_campus_dialog.dart';
 import '../dialogs/select_default_view.dart';
 import '../dialogs/select_design_dialog.dart';
 import '../dialogs/select_lock_dialog.dart';
@@ -130,18 +129,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         showDialog(
                           context: context,
                           builder: (context) => const SelectDesignDialog(),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.location_on),
-                      title: Text(
-                        "Campus: ${state.campus.text}",
-                      ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => const SelectCampusDialog(),
                         );
                       },
                     ),

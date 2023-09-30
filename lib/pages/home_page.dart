@@ -4,8 +4,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../dialogs/changelog_dialog.dart';
 import '../dialogs/confirm_refresh_dialog.dart';
-import '../model/campus.dart';
-import '../model/constants.dart';
 import '../model/date_time_calculator.dart';
 import '../model/redux/actions.dart' as redux;
 import '../model/redux/app_state.dart';
@@ -21,7 +19,7 @@ import '../widgets/week_selector.dart';
 import '../widgets/weekday_selector.dart';
 import 'grades_overview_page.dart';
 import 'login_page.dart';
-import 'pdf_page.dart';
+import 'mensa_page.dart';
 import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -185,34 +183,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PdfPage(
-                        title: "Speiseplan",
-                        url: state.campus == Campus.bottrop
-                            ? MENSA_BOT_CURRENT_URL
-                            : MENSA_MUE_CURRENT_URL,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.fastfood,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                title: const Text("Speiseplan (nächste Woche)"),
-                onTap: () {
-                  Navigator.pop(context);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PdfPage(
-                        title: "Speiseplan",
-                        url: state.campus == Campus.bottrop
-                            ? MENSA_BOT_NEXT_URL
-                            : MENSA_MUE_NEXT_URL,
-                      ),
+                      builder: (context) => const MensaPage(),
                     ),
                   );
                 },
